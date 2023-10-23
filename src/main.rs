@@ -18,9 +18,8 @@ async fn main(
 
     #[allow(clippy::no_effect_underscore_binding)]
     Ok(rocket::build()
-        .mount("/static", FileServer::from(relative!("static")).rank(10))
-        .mount("/static", FileServer::from(concat!(env!("OUT_DIR"), "/js")).rank(11))
-        .mount("/static", FileServer::from(concat!(env!("OUT_DIR"), "/css")).rank(12))
+        .mount("/static", FileServer::from(relative!("/static")).rank(10))
+        .mount("/static", FileServer::from(relative!("/dist")).rank(11))
         .mount("/", routes![
             index,
         ])

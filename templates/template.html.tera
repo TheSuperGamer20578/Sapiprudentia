@@ -3,11 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <title>Sapiprudentia</title>
-    <link rel="stylesheet" href="/static/main.css">
     <script src="/static/main.js" defer></script>
     {% block head %}{% endblock %}
 </head>
 <body>
-    {% block content %}{% endblock %}
+    <aside>
+        <div class="user">
+            lorem ipsum dolor sit amet
+            <!-- TODO Current user -->
+        </div>
+        <nav>
+            <ul class="nav-list">
+                <li><a href="#">lorem</a></li>
+                <li><a href="#">ipsum</a></li>
+                <li><a href="#">dolor</a></li>
+                <li><a href="#">sit</a></li>
+                <li><a href="#">amet</a></li>
+            </ul>
+            <ul class="nav-list border-top">
+                <li><a href="#">lorem</a></li>
+                <li><a href="#">ipsum</a></li>
+                <li><a href="#">dolor</a></li>
+                <li><a href="#">sit</a></li>
+                <li><a href="#">amet</a></li>
+            </ul>
+            <ul class="nav-list border-top">
+                <li><a href="#">lorem</a></li>
+                <li><a href="#">ipsum</a></li>
+                <li><a href="#">dolor</a></li>
+                <li><a href="#">sit</a></li>
+                <li><a href="#">amet</a></li>
+            </ul>
+        </nav>
+    </aside>
+    <main>
+        <header>
+            <!-- TODO Breadcrumbs -->
+            Lorem ipsum dolor sit amet.
+        </header>
+        <div class="scroll-container">
+            <article>
+                <input class="title" aria-label="Title" placeholder="Title">
+                <div class="editor"></div>
+            </article>
+        </div>
+    </main>
 </body>
 </html>

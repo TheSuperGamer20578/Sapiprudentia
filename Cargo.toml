@@ -11,3 +11,6 @@ shuttle-rocket = "0.29.0"
 shuttle-runtime = "0.29.0"
 sqlx = { version = "0.7.2", features = ["postgres", "macros"] }
 tokio = "1.26.0"
+
+[build-dependencies]
+build-pretty = "1.0.0"
