@@ -1,14 +1,11 @@
 #![warn(clippy::pedantic)]
 
-use rocket::{get, routes};
-use rocket::fs::{FileServer, relative};
-use rocket_dyn_templates::{context, Template};
-use sqlx::PgPool;
+mod api;
+mod documents;
 
-#[get("/")]
-fn index() -> Template {
-    Template::render("template", context! {})
-}
+use rocket::fs::{FileServer, relative};
+use rocket_dyn_templates::Template;
+use sqlx::PgPool;
 
 #[shuttle_runtime::main]
 async fn main(
@@ -16,13 +13,11 @@ async fn main(
 ) -> shuttle_rocket::ShuttleRocket {
     sqlx::migrate!().run(&db).await.unwrap();
 
-    #[allow(clippy::no_effect_underscore_binding)]
     Ok(rocket::build()
         .mount("/static", FileServer::from(relative!("/static")).rank(10))
         .mount("/static", FileServer::from(relative!("/dist")).rank(11))
-        .mount("/", routes![
-            index,
-        ])
+        .mount("/api", &**api::ROUTES)
+        .mount("/document", &**documents::ROUTES)
         .manage(db)
         .attach(Template::fairing())
         .into())

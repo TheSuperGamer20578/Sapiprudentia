@@ -43,7 +43,12 @@ import {FileHandler} from "@tiptap-pro/extension-file-handler";
 import {BubbleMenu} from "@tiptap/extension-bubble-menu";
 import {FloatingMenu} from "@tiptap/extension-floating-menu";
 import {Highlight} from "@tiptap/extension-highlight";
+// @ts-ignore
 import "katex/contrib/mhchem/mhchem.js";
+import {getDocument, updateDocument} from "./api";
+
+const documentId = document.getElementById("document-title")!.getAttribute("data-document-id")!;
+const document_ = await getDocument(documentId);
 
 // TODO Slash commands
 new Editor({
@@ -108,5 +113,17 @@ new Editor({
         Underline,
     ],
     injectCSS: false,
-    autofocus: true,
+    autofocus: document_.title.length !== 0,
+    content: (await getDocument(documentId)).content,
+    onUpdate: async ({editor}) => {
+        await updateDocument(documentId, {
+            content: editor.getJSON(),
+        })
+    },
+});
+
+document.getElementById("document-title")!.addEventListener("change", async (event: any) => {
+    await updateDocument(documentId, {
+        title: event.currentTarget.value,
+    });
 });

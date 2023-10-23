@@ -2368,6 +2368,7 @@ dependencies = [
  "rocket_codegen",
  "rocket_http",
  "serde",
+ "serde_json",
  "state",
  "tempfile",
  "time",
@@ -2625,8 +2626,11 @@ name = "sapiprudentia"
 version = "0.1.0"
 dependencies = [
  "build-pretty",
+ "lazy_static",
  "rocket",
  "rocket_dyn_templates",
+ "serde",
+ "serde_json",
  "shuttle-aws-rds",
  "shuttle-rocket",
  "shuttle-runtime",
