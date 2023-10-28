@@ -45,9 +45,9 @@ import {FloatingMenu} from "@tiptap/extension-floating-menu";
 import {Highlight} from "@tiptap/extension-highlight";
 // @ts-ignore
 import "katex/contrib/mhchem/mhchem.js";
-import {getDocument, updateDocument} from "./api";
+import {getDocument, queueChanges, updateDocument} from "./api";
 
-const documentId = document.getElementById("document-title")!.getAttribute("data-document-id")!;
+const documentId = parseInt(document.getElementById("document-title")!.getAttribute("data-document-id")!);
 const document_ = await getDocument(documentId);
 
 // TODO Slash commands
@@ -116,14 +116,14 @@ new Editor({
     autofocus: document_.title.length !== 0,
     content: (await getDocument(documentId)).content,
     onUpdate: async ({editor}) => {
-        await updateDocument(documentId, {
+        await queueChanges(updateDocument, documentId, {
             content: editor.getJSON(),
         })
     },
 });
 
-document.getElementById("document-title")!.addEventListener("change", async (event: any) => {
-    await updateDocument(documentId, {
+document.getElementById("document-title")!.addEventListener("input", async (event: any) => {
+    await queueChanges(updateDocument, documentId, {
         title: event.currentTarget.value,
     });
 });
