@@ -7,14 +7,14 @@
     {% block head %}{% endblock %}
 </head>
 <body>
-    <aside>
+    <div class="sidebar">
         <div class="user">
             lorem ipsum dolor sit amet
             <!-- TODO Current user -->
         </div>
         <nav>
             <ul class="nav-list">
-                {% for document in documents %}
+                {% for document in global.documents %}
                     <li><a href="/document/{{ document.id }}">{{ document.title }}</a></li>
                 {% endfor %}
                 <li><a href="/document/new">New</a></li>
@@ -34,22 +34,17 @@
                 <li><a href="#">amet</a></li>
             </ul>
         </nav>
-    </aside>
-    <main>
+    </div>
+    <div class="main">
         <header>
             <!-- TODO Breadcrumbs -->
             Lorem ipsum dolor sit amet.
         </header>
         <div class="scroll-container">
-            <article>
-                <div class="document-title-block">
-                    <input id="document-title" data-document-id="{{ document_id }}" class="title" aria-label="Title" placeholder="Title" maxlength="255" value="{{ document_title }}" {% if new_document %} autofocus {% endif %}>
-                    <p class="save-indicator save-indicator-saved">Changes Saved</p>
-                    <p class="save-indicator save-indicator-pending">Saving...</p>
-                </div>
-                <div class="editor"></div>
-            </article>
+            <main>
+                {% block content %}{% endblock %}
+            </main>
         </div>
-    </main>
+    </div>
 </body>
 </html>
