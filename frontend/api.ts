@@ -29,10 +29,10 @@ function setSaveIndicator(pending: boolean) {
     }
     pendingChanges = pending;
     setTimeout(() => {
-        Array.from(document.getElementsByClassName("save-indicator-saved")).map((element) => {
+        Array.from(document.getElementsByClassName("save-indicator-saved")).forEach((element) => {
             element.classList.toggle("hidden", pendingChanges);
         })
-        Array.from(document.getElementsByClassName("save-indicator-pending")).map((element) => {
+        Array.from(document.getElementsByClassName("save-indicator-pending")).forEach((element) => {
             element.classList.toggle("hidden", !pendingChanges);
         })
     }, 250);
@@ -41,7 +41,7 @@ function setSaveIndicator(pending: boolean) {
 setSaveIndicator(false);
 let queue: Map<(id: any, param: any) => Promise<void>, Map<any, object>> = new Map();
 
-export async function queueChanges<I, P extends Partial<object>>(func: (id: I, param: P) => Promise<void>, id: I, param: P): Promise<void> {
+export function queueChanges<I, P extends Partial<object>>(func: (id: I, param: P) => Promise<void>, id: I, param: P): void {
     let fn_map = queue.get(func) ?? new Map();
     let current = fn_map.get(id) ?? {};
     fn_map.set(id, {...current, ...param});

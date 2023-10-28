@@ -15,7 +15,7 @@
         <nav>
             <ul class="nav-list">
                 {% for document in global.documents %}
-                    <li><a href="/document/{{ document.id }}">{{ document.title }}</a></li>
+                    <li><a href="/document/{{ document.id }}" data-title-of="{{ document.id }}">{{ document.title }}</a></li>
                 {% endfor %}
                 <li><a href="/document/new">New</a></li>
             </ul>

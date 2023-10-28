@@ -115,15 +115,18 @@ new Editor({
     injectCSS: false,
     autofocus: document_.title.length !== 0,
     content: (await getDocument(documentId)).content,
-    onUpdate: async ({editor}) => {
-        await queueChanges(updateDocument, documentId, {
+    onUpdate: ({editor}) => {
+        queueChanges(updateDocument, documentId, {
             content: editor.getJSON(),
         })
     },
 });
 
-document.getElementById("document-title")!.addEventListener("input", async (event: any) => {
-    await queueChanges(updateDocument, documentId, {
-        title: event.currentTarget.value,
+document.getElementById("document-title")!.addEventListener("input", (event: any) => {
+    document.querySelectorAll(`[data-title-of="${documentId}"]`).forEach((element) => {
+        element.textContent = event.currentTarget.value.trim() || "Untitled";
+    });
+    queueChanges(updateDocument, documentId, {
+        title: event.currentTarget.value.trim(),
     });
 });
