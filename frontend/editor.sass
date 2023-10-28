@@ -42,13 +42,13 @@
     border-radius: $corners
 
   > * + *
-    margin-block: $padding / 2
+    margin-block: calc($padding / 2)
 
   code
     font-family: $font-mono
     background-color: $bg-dark
     color: $fg-dark
-    padding: $padding/10 $padding/4
+    padding: calc($padding / 10) calc($padding / 4)
     border-radius: $corners
     display: inline-block
 
@@ -80,7 +80,7 @@
   hr
     border: none
     border-top: 1px solid $div
-    margin: $padding $padding/2
+    margin: $padding calc($padding / 2)
 
   a:visited
     color: inherit
@@ -90,14 +90,14 @@
     color: $fg-placeholder
     background: $bg-placeholder
     border-radius: $corners
-    padding: $padding/4
+    padding: calc($padding / 4)
     content: attr(data-placeholder)
     text-transform: capitalize
     position: absolute
     z-index: -1
     pointer-events: none
-    margin-top: -$padding/4
-    margin-left: -$padding/4
+    margin-top: - calc($padding / 4)
+    margin-left: - calc($padding / 4)
 
   // pre.is-empty code::before
     content: "Code Block"
@@ -140,7 +140,7 @@
       background-color: $bg-placeholder
 
   .Tiptap-mathematics-editor, .Tiptap-mathematics-render
-    padding: $padding/10 $padding/4
+    padding: calc($padding / 10) calc($padding / 4)
     border-radius: $corners
     display: inline-block
 
