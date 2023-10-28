@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Sapiprudentia</title>
+    <link rel="stylesheet" href="/static/main.css">
     <script src="/static/main.js" defer></script>
     {% block head %}{% endblock %}
 </head>

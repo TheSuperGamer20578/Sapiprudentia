@@ -3,7 +3,7 @@
     <div class="document-title-block">
         <input id="document-title" data-document-id="{{ document_id }}" class="title" aria-label="Title" placeholder="Title" maxlength="255" value="{{ document_title }}" {% if new_document %} autofocus {% endif %}>
         <p class="save-indicator save-indicator-saved">Changes Saved</p>
-        <p class="save-indicator save-indicator-pending">Saving...</p>
+        <p class="save-indicator save-indicator-pending hidden">Saving...</p>
     </div>
     <div class="editor"></div>
 {% endblock %}

@@ -4,6 +4,7 @@ use std::env;
 use build_pretty::{build_pretty, CommandBuilder};
 
 fn main() {
+    println!("cargo:rerun-if-env-changed=NPM");
     println!("cargo:rerun-if-changed=migrations");
     println!("cargo:rerun-if-changed=frontend");
     println!("cargo:rerun-if-changed=package.json");

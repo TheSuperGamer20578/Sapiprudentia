@@ -1,7 +1,11 @@
 import { Configuration } from "webpack";
 import "webpack-dev-server";
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
 
 const config: Configuration = {
+    plugins: [
+        new MiniCssExtractPlugin(),
+    ],
     entry: "./frontend/index.ts",
     module: {
         rules: [
@@ -12,7 +16,7 @@ const config: Configuration = {
             },
             {
                 test: /\.s[ac]ss$/i,
-                use: ["style-loader", "css-loader", "sass-loader"],
+                use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
             },
         ],
     },
