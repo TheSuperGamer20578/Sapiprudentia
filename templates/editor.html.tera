@@ -1,9 +1,9 @@
 {% extends "template" %}
 {% block content %}
     <div class="document-title-block">
-        <input id="document-title" data-document-id="{{ document_id }}" class="title" aria-label="Title" placeholder="Title" maxlength="255" value="{{ document_title }}" {% if new_document %} autofocus {% endif %}>
+        <input id="document-title" class="title" aria-label="Title" placeholder="Title" maxlength="255" value="{{ document_title }}" {% if new_document %} autofocus {% endif %}>
         <p class="save-indicator save-indicator-saved">Changes Saved</p>
         <p class="save-indicator save-indicator-pending hidden">Saving...</p>
     </div>
-    <div class="editor"></div>
+    <div class="editor" data-title-element="document-title" data-document-id="{{ document_id }}" data-content-element="document-content"></div>
 {% endblock %}
