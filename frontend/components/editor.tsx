@@ -1,4 +1,4 @@
-import React, {ChangeEvent} from 'react';
+import React, {ChangeEvent, useState} from 'react';
 import './editor.sass';
 import {EditorProvider} from "@tiptap/react";
 import {Blockquote} from "@tiptap/extension-blockquote";
@@ -46,6 +46,8 @@ import {Typography} from "@tiptap/extension-typography";
 import {Underline} from "@tiptap/extension-underline";
 import {getDocument, updateDocument} from "../api";
 import {useSync} from "../sync";
+import Loader from "./loader";
+import Centre from "./centre";
 
 interface Props {
     documentId: number,
@@ -55,15 +57,25 @@ interface Props {
 
 export default function Editor({ documentId, showTitle, autofocus }: Props) {
     const [doc, pending, setDoc] = useSync(documentId, getDocument, updateDocument);
+    const [loading, setLoading] = useState(true);
     if (doc === undefined) {
-        return <></>;  // TODO Loading indicator
+        return (
+            <Centre>
+                <Loader />
+            </Centre>
+        );
     }
-    console.log(doc);
     return <>
         <div className="document-title-block">
-            {showTitle && <h1 contentEditable={true} onInput={(e: ChangeEvent<HTMLHeadingElement>) => {
-                setDoc({title: e.currentTarget.innerText});
-            }}>{doc.title}</h1>}
+            {showTitle && <input
+                className="title"
+                aria-label="Title"
+                placeholder="Title"
+                maxLength={255}
+                defaultValue={doc.title}
+                onInput={(e: ChangeEvent<HTMLInputElement>) => {
+                    setDoc({title: e.currentTarget.value});
+            }} />}
             <p className="save-indicator">{pending ? "Saving..." : "Changes Saved"}</p>
         </div>
         <EditorProvider
@@ -132,7 +144,9 @@ export default function Editor({ documentId, showTitle, autofocus }: Props) {
                 setDoc({content: editor.getJSON()});
             }}
             content={doc.content}
+            onCreate={() => setLoading(false)}
         >
         </EditorProvider>
+        {loading && <Loader />}
     </>;
 }

@@ -16,8 +16,6 @@ export function useSync<I, T>(id: I, initial: (id: I) => Promise<T>, sync: (id: 
         return () => clearInterval(interval);
     }, []);
     return [value, Object.keys(pending).length !== 0, (value: Partial<T>) => {
-        // console.log(value);
-        console.log(pending);
         setPending((current) => ({...current, ...value}));
         if (value === undefined) {
             console.warn("Attempted to set value before initial value was loaded");

@@ -1,10 +1,15 @@
 import React from "react";
 import styles from "./main.module.sass";
-import {Outlet} from "react-router-dom";
+import {Outlet, useNavigation} from "react-router-dom";
 import Editor from "../components/editor";
+import Overlay from "../components/overlay";
+import Loader from "../components/loader";
 
 export default function LayoutMain() {
-    return (
+    const navigation = useNavigation();
+
+    return <>
+        {navigation.state === "loading" && <Overlay><Loader /></Overlay>}
         <div className={styles.root}>
             <div className={styles.sidebar}>
                 <div className={styles.user}>
@@ -38,5 +43,5 @@ export default function LayoutMain() {
                 </div>
             </div>
         </div>
-    );
+    </>;
 }
