@@ -6,7 +6,10 @@ const config: Configuration = {
     plugins: [
         new MiniCssExtractPlugin(),
     ],
-    entry: "./frontend/index.ts",
+    entry: {
+        main: "./frontend/index.ts",
+        react: "./frontend/index.tsx",
+    },
     module: {
         rules: [
             {
@@ -16,12 +19,12 @@ const config: Configuration = {
             },
             {
                 test: /\.s[ac]ss$/i,
-                use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
+                use: ["style-loader", "css-loader", "sass-loader"],
             },
         ],
     },
     resolve: {
-        extensions: [".ts", ".js"],
+        extensions: [".ts", ".tsx", ".js", ".jsx"],
     },
     mode: "development",
     devServer: {
@@ -32,6 +35,7 @@ const config: Configuration = {
             "/": "http://localhost:8000",
         },
     },
+    devtool: "source-map",
 };
 
 export default config;

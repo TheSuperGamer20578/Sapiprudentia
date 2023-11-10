@@ -41,6 +41,9 @@ function setSaveIndicator(pending: boolean) {
 setSaveIndicator(false);
 let queue: Map<(id: any, param: any) => Promise<void>, Map<any, object>> = new Map();
 
+/**
+ * @deprecated Use useSync instead
+ */
 export function queueChanges<I, P extends Partial<object>>(func: (id: I, param: P) => Promise<void>, id: I, param: P): void {
     let fn_map = queue.get(func) ?? new Map();
     let current = fn_map.get(id) ?? {};

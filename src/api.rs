@@ -46,13 +46,13 @@ impl From<Document> for PartialDocument {
 }
 
 #[get("/document/<id>")]
-async fn get_document(id: i32, db: &State<PgPool>) -> Json<Document> {
+async fn get_document(id: i32, db: &State<PgPool>) -> Option<Json<Document>> {
     let document = query!(/* language=sql */ "SELECT title, content FROM documents WHERE id = $1;", id)
-        .fetch_one(&**db).await.unwrap();
-    Json(Document {
+        .fetch_optional(&**db).await.unwrap()?;
+    Some(Json(Document {
         title: document.title,
         content: document.content,
-    })
+    }))
 }
 
 #[patch("/document/<id>", data = "<document>")]

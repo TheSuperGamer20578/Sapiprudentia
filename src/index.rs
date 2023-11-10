@@ -7,6 +7,7 @@ use crate::global_context;
 lazy_static! {
     pub static ref ROUTES: Vec<Route> = routes![
         index,
+        react,
     ];
 }
 
@@ -15,4 +16,9 @@ async fn index(db: &State<PgPool>) -> Template {
     Template::render("index", context! {
         global: global_context(db).await,
     })
+}
+
+#[get("/react")]
+async fn react() -> Template {
+    Template::render("react", context! {})
 }
