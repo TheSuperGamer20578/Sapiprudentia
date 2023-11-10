@@ -5,7 +5,7 @@ import LayoutMain from "./templates/main";
 
 const router = createBrowserRouter([
     {
-        path: "/react/",
+        path: "/",
         element: <LayoutMain />,
     },
 ]);

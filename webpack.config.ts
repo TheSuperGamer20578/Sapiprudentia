@@ -3,12 +3,8 @@ import "webpack-dev-server";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 
 const config: Configuration = {
-    plugins: [
-        new MiniCssExtractPlugin(),
-    ],
     entry: {
-        main: "./frontend/index.ts",
-        react: "./frontend/index.tsx",
+        bundle: "./frontend/index.tsx",
     },
     module: {
         rules: [

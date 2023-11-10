@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>React Test</title>
-    <script src="/static/react.js" defer></script>
+    <title>Sapiprudentia</title>
+    <script src="/static/bundle.js" defer></script>
 </head>
 <body>
     <div id="app"></div>
