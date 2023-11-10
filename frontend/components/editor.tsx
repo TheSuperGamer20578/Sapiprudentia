@@ -73,6 +73,7 @@ export default function Editor({ documentId, showTitle, autofocus }: Props) {
                 placeholder="Title"
                 maxLength={255}
                 defaultValue={doc.title}
+                autoFocus={autofocus && doc.title?.length === 0}
                 onInput={(e: ChangeEvent<HTMLInputElement>) => {
                     setDoc({title: e.currentTarget.value});
             }} />}
@@ -139,7 +140,7 @@ export default function Editor({ documentId, showTitle, autofocus }: Props) {
                 Underline,
             ]}
             injectCSS={false}
-            autofocus={autofocus}
+            autofocus={autofocus && doc.title?.length !== 0}
             onUpdate={({editor}) => {
                 setDoc({content: editor.getJSON()});
             }}
