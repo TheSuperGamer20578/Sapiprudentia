@@ -33,7 +33,6 @@ export default function LayoutMain() {
                 </header>
                 <div className={styles.scrollContainer}>
                     <main>
-                        <Editor documentId={0} showTitle={true} autofocus={true} />
                         <Outlet />
                     </main>
                 </div>

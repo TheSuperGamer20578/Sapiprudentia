@@ -4,7 +4,7 @@ import MiniCssExtractPlugin from "mini-css-extract-plugin";
 
 const config: Configuration = {
     entry: {
-        bundle: "./frontend/index.tsx",
+        bundle: "./frontend/router.tsx",
     },
     module: {
         rules: [
