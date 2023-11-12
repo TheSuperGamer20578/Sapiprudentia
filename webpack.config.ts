@@ -3,6 +3,9 @@ import "webpack-dev-server";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 
 const config: Configuration = {
+    plugins: [
+        new MiniCssExtractPlugin(),
+    ],
     entry: {
         bundle: "./frontend/router.tsx",
     },
@@ -15,7 +18,11 @@ const config: Configuration = {
             },
             {
                 test: /\.s[ac]ss$/i,
-                use: ["style-loader", "css-loader", "sass-loader"],
+                use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
+            },
+            {
+                test: /\.css$/i,
+                use: [MiniCssExtractPlugin.loader, "css-loader"],
             },
         ],
     },

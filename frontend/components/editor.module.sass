@@ -1,10 +1,6 @@
-// TODO Refactor into module
-
 @import "../vars"
-@import "~highlight.js/scss/base16/onedark"
-@import "~katex/dist/katex.css"
 
-.tiptap
+\:global :local(.editorBody) .tiptap
   outline: none
   word-wrap: break-word
   white-space: pre-wrap
@@ -148,7 +144,7 @@
     border-radius: $corners
     display: inline-block
 
-input.title
+.title
   font-size: 3em
   outline: none
   border: none
@@ -157,5 +153,51 @@ input.title
   font-weight: bolder
   width: 100%
 
-.document-title-block
+.titleBlock
   margin-block: 2em 1em
+
+.saveIndicator
+  color: $fg-placeholder
+  font-size: 0.75em
+
+.bubbleMenu
+  padding: 0.5em 1em
+  background: $bg2
+  border: $div-border
+  border-radius: $corners
+  box-shadow: $greyer 0.25em 0.25em 0.25em
+
+  button
+    border: none
+    outline: none
+    border-radius: $corners
+    background-color: transparent
+    padding: 0.25em
+    min-width: 2em
+    margin-inline: 0.1em
+    transition: background-color 0.25s ease-in-out
+
+    &:hover
+      background-color: $greyer
+
+    &:active
+      background-color: $greyer2
+      transition: none
+
+    &:disabled
+      color: $fg-placeholder
+      background-color: transparent
+
+    &.active
+      background-color: $bg-accent
+      color: $fg-accent
+
+      &:hover
+        background-color: mix($bg-accent, $greyer)
+
+      &:active
+        background-color: mix($bg-accent, $greyer2)
+
+        &:disabled
+          background-color: mix($bg-accent, $bg-placeholder)
+          color: mix($fg-accent, $fg-placeholder)
