@@ -4,15 +4,19 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+anyhow = "1.0.75"
+argon2 = { version = "0.5.2", features = ["std"] }
+chrono = "0.4.31"
+email_address = "0.2.4"
 lazy_static = "1.4.0"
-rocket = { version = "0.5.0-rc.2", features = ["json"] }
+rocket = { version = "0.5.0-rc.2", features = ["json", "secrets"] }
 rocket_dyn_templates = { version = "0.1.0-rc.3", features = ["tera"] }
 serde = "1.0.189"
 serde_json = "1.0.107"
 shuttle-aws-rds = { version = "0.29.0", features = ["postgres"] }
 shuttle-rocket = "0.29.0"
 shuttle-runtime = "0.29.0"
-sqlx = { version = "0.7.2", features = ["postgres", "macros"] }
+sqlx = { version = "0.7.2", features = ["postgres", "macros", "chrono"] }
 tokio = "1.26.0"
 
 [build-dependencies]

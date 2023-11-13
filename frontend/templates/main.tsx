@@ -1,19 +1,20 @@
-import React from "react";
+import React, {useContext} from "react";
 import styles from "./main.module.sass";
-import {Outlet, useNavigation} from "react-router-dom";
-import Editor from "../components/editor";
-import Overlay from "../components/overlay";
-import Loader from "../components/loader";
+import {Outlet} from "react-router-dom";
+import LoadingOverlay from "../components/loadingOverlay";
+import {AuthContext} from "../auth";
+import Gravatar from "react-gravatar";
 
 export default function LayoutMain() {
-    const navigation = useNavigation();
+    let user = useContext(AuthContext);
 
     return <>
-        {navigation.state === "loading" && <Overlay><Loader /></Overlay>}
+        <LoadingOverlay />
         <div className={styles.root}>
             <div className={styles.sidebar}>
                 <div className={styles.user}>
-                    lorem ipsum dolor sit amet
+                    <Gravatar className={styles.avatar} email={user.email} />
+                    {user.name}
                 </div>
                 <nav>
                     <ul className={[styles.navList, styles.borderTop].join(" ")}>

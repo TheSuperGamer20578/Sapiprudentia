@@ -1,7 +1,8 @@
 #![warn(clippy::pedantic)]
 
-mod api;
+mod api_v1;
 mod react;
+mod auth;
 
 use rocket::fs::{FileServer, relative};
 use rocket_dyn_templates::Template;
@@ -16,7 +17,7 @@ async fn main(
     Ok(rocket::build()
         .mount("/static", FileServer::from(relative!("/static")).rank(10))
         .mount("/static", FileServer::from(relative!("/dist")).rank(11))
-        .mount("/api", &**api::ROUTES)
+        .mount("/api/v1", &**api_v1::ROUTES)
         .mount("/", &**react::ROUTES)
         .manage(db)
         .attach(Template::fairing())

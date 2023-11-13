@@ -5,6 +5,8 @@ import LayoutMain from "./templates/main";
 import Index from "./routes";
 import ErrorPage from "./routes/error";
 import EditorPage from "./routes/editorPage";
+import {AuthProvider} from "./auth";
+import LoadingOverlay from "./components/loadingOverlay";
 
 const router = createBrowserRouter([
     {
@@ -26,6 +28,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("app")!).render(
     <React.StrictMode>
-        <RouterProvider router={router} />
+        <AuthProvider>
+            <RouterProvider router={router} />
+        </AuthProvider>
     </React.StrictMode>
 );
