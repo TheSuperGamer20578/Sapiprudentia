@@ -3,16 +3,18 @@ import {current_user, HttpError, login, UnauthorizedError, updateUser, User} fro
 import LoadingOverlay from "./components/loadingOverlay";
 import Centre from "./components/centre";
 import styles from "./auth.module.sass";
+import PubSub from "pubsub-js";
 
 export const AuthContext = React.createContext<User>(null!);
 
 export function AuthProvider(props: {children: React.ReactNode}) {
     const [user, setUser] = useState<User | null | undefined>(undefined);
     useEffect(() => {
+        PubSub.subscribe("login_required", () => {
+            setUser(null);
+        });
         current_user().then(setUser).catch((e) => {
-            if (e instanceof UnauthorizedError) {
-                setUser(null);
-            } else {
+            if (!(e instanceof UnauthorizedError)) {
                 throw e;
             }
         });
@@ -65,7 +67,7 @@ function LoginForm({setUser}: {setUser: (user: User) => void}) {
                     {error !== null && <p className={styles.validation}>{error}</p>}
                     <label>
                         <p>Username or email:</p>
-                        <input type="text" required onInput={(e: ChangeEvent<HTMLInputElement>) => {
+                        <input type="text" required autoFocus onInput={(e: ChangeEvent<HTMLInputElement>) => {
                             setUsername(e.currentTarget.value);
                         }}/>
                     </label>
@@ -105,7 +107,7 @@ function PasswordChangeForm({setUser}: {setUser: (user: User) => void}) {
                     {error !== null && <p className={styles.validation}>{error}</p>}
                     <label>
                         <p>Password:</p>
-                        <input type="password" required onInput={(e: ChangeEvent<HTMLInputElement>) => {
+                        <input type="password" required autoFocus onInput={(e: ChangeEvent<HTMLInputElement>) => {
                             setPassword(e.currentTarget.value);
                         }}/>
                     </label>

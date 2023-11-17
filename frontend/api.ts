@@ -1,3 +1,5 @@
+import PubSub from "pubsub-js";
+
 export const API_VERSION = 1;
 const BASE_URL = `/api/v${API_VERSION}`;
 
@@ -27,7 +29,12 @@ export class HttpError extends Error {
     }
 }
 
-export class UnauthorizedError extends HttpError {}
+export class UnauthorizedError extends HttpError {
+    constructor(response: Response) {
+        PubSub.publish("login_required", null);
+        super(response);
+    }
+}
 
 function throwForStatus(response: Response) {
     if (response.status === 401) {
@@ -72,6 +79,7 @@ export async function logout(): Promise<void> {
         method: "DELETE",
     });
     throwForStatus(response);
+    PubSub.publish("login_required", null);
 }
 
 export async function updateUser(update: { username?: string, name?: string, email?: string, password?: string }): Promise<void> {

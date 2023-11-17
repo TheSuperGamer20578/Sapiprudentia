@@ -4,6 +4,8 @@ import {Outlet} from "react-router-dom";
 import LoadingOverlay from "../components/loadingOverlay";
 import {AuthContext} from "../auth";
 import Gravatar from "react-gravatar";
+import Dropdown from "../components/dropdown";
+import {logout} from "../api";
 
 export default function LayoutMain() {
     let user = useContext(AuthContext);
@@ -12,10 +14,16 @@ export default function LayoutMain() {
         <LoadingOverlay />
         <div className={styles.root}>
             <div className={styles.sidebar}>
-                <div className={styles.user}>
+                <Dropdown button={<>
+                    <div className={styles.user}>
+                        <Gravatar className={styles.avatar} email={user.email} />
+                        {user.name}
+                    </div>
+                </>}>
                     <Gravatar className={styles.avatar} email={user.email} />
                     {user.name}
-                </div>
+                    <button onClick={logout}>Logout</button>
+                </Dropdown>
                 <nav>
                     <ul className={[styles.navList, styles.borderTop].join(" ")}>
                         <li><a href="#">lorem</a></li>
