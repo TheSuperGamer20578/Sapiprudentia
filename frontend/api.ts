@@ -3,11 +3,6 @@ import PubSub from "pubsub-js";
 export const API_VERSION = 1;
 const BASE_URL = `/api/v${API_VERSION}`;
 
-export interface Document {
-    title: string;
-    content: object | null;
-}
-
 export enum AccountType {
     USER = 0,
     ADMIN = 1,
@@ -45,19 +40,46 @@ function throwForStatus(response: Response) {
     }
 }
 
-export async function getDocument(id: number): Promise<Document> {
-    const response = await fetch(`${BASE_URL}/document/${id}`);
-    throwForStatus(response);
-    return await response.json();
+function crud<T>(endpoint: string) {
+    return {
+        async list(id: number): Promise<T[]> {
+            const response = await fetch(`${BASE_URL}${endpoint}`);
+            throwForStatus(response);
+            return await response.json();
+        },
+        async create(data: T): Promise<number> {
+            const response = await fetch(`${BASE_URL}${endpoint}`, {
+                method: "POST",
+                body: JSON.stringify(data),
+            });
+            throwForStatus(response);
+            return await response.json();
+        },
+        async get(id: number): Promise<T> {
+            const response = await fetch(`${BASE_URL}${endpoint}/${id}`);
+            throwForStatus(response);
+            return await response.json();
+        },
+        async update(id: number, data: Partial<T>): Promise<void> {
+            const response = await fetch(`${BASE_URL}${endpoint}/${id}`, {
+                method: "PATCH",
+                body: JSON.stringify(data),
+            });
+            throwForStatus(response);
+        },
+        async delete(id: number): Promise<void> {
+            const response = await fetch(`${BASE_URL}${endpoint}/${id}`, {
+                method: "DELETE",
+            });
+            throwForStatus(response);
+        },
+    };
 }
 
-export async function updateDocument(id: number, document: Partial<Document>): Promise<void> {
-    const response = await fetch(`${BASE_URL}/document/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify(document),
-    });
-    throwForStatus(response);
-}
+export const {get: getDocument, update: updateDocument} = crud<{
+    title: string,
+    content: object | null,
+}>("/document");
 
 export async function login(login: string, password: string): Promise<User> {
     const response = await fetch(`${BASE_URL}/login`, {

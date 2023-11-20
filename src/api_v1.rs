@@ -6,15 +6,14 @@ use lazy_static::lazy_static;
 use rocket::{delete, get, patch, post, Route, routes, State};
 use rocket::http::{Cookie, CookieJar, Status};
 use rocket::serde::json::Json;
-use rocket::serde::Serialize;
 use serde::{Deserialize};
 use sqlx::{PgPool, query};
 use crate::auth::{ARGON2, Identity, User};
 
 lazy_static! {
     pub static ref ROUTES: Vec<Route> = routes![
-        get_document,
-        patch_document,
+        document::get,
+        document::update,
         login,
         current_user,
         logout,
@@ -22,80 +21,122 @@ lazy_static! {
     ];
 }
 
-#[derive(Serialize, Deserialize)]
-struct Document {
+macro_rules! crud {
+    ($module:ident, $route:literal, $route_id:literal, $table:literal, {$($field:ident: $field_type:ty),*$(,)?}) => {
+        #[allow(dead_code)]  // rocket emitts structs
+        #[allow(unused_imports)]  // and imports
+        mod $module {
+            use rocket::http::Status;
+            use rocket::serde::json::Json;
+            use sqlx::{FromRow, PgPool, query, query_as};
+            use rocket::{delete, get, patch, post, State};
+            use serde::{Serialize, Deserialize};
+            use itertools::Itertools;
+            use crate::auth::User;
+
+            #[derive(FromRow)]
+            pub(super) struct Full {
+                id: i32,
+                owner: i32,
+                $($field: $field_type),*
+            }
+
+            #[derive(Serialize, FromRow)]
+            pub(super) struct Send {
+                id: i32,
+                $($field: $field_type),*
+            }
+
+            impl From<Full> for Send {
+                fn from(value: Full) -> Self {
+                    Self {
+                        id: value.id,
+                        $($field: value.$field),*
+                    }
+                }
+            }
+
+            #[derive(Deserialize)]
+            pub(super) struct Create {
+                $($field: $field_type),*
+            }
+
+            #[derive(Deserialize)]
+            pub(super) struct Update {
+                $($field: Option<$field_type>),*
+            }
+
+            #[get($route)]
+            pub(super) async fn list(db: &State<PgPool>, user: User) -> Json<Vec<Send>> {
+                Json(query_as(&format!("SELECT * FROM {} WHERE owner = $1;", $table))
+                    .bind(user.id)
+                    .fetch_all(&**db).await.unwrap())
+            }
+
+            #[post($route, data = "<create>")]
+            pub(super) async fn create(create: Json<Create>, db: &State<PgPool>, user: User) -> Status {
+                query(&format!("INSERT INTO {} (owner, {}) VALUES ($1, {});", $table, stringify!($($field),*), vec! [$(stringify!($field)),*].iter().enumerate().map(|(i, _)| format!("${}", i + 2)).join(", ")))
+                    .bind(user.id)
+                    $(.bind(&create.$field))*
+                    .execute(&**db).await.unwrap();
+                Status::NoContent
+            }
+
+            #[get($route_id)]
+            pub(super) async fn get(id: i32, db: &State<PgPool>, user: User) -> Option<Result<Json<Send>, Status>> {
+                let object: Full = query_as(&format!("SELECT * FROM {} WHERE id = $1;", $table))
+                    .bind(id)
+                    .fetch_optional(&**db).await.unwrap()?;
+                if object.owner != user.id {
+                    return Some(Err(Status::Forbidden));
+                }
+                Some(Ok(Json(object.into())))
+            }
+
+            #[patch($route_id, data = "<update>")]
+            pub(super) async fn update(update: Json<Update>, id: i32, db: &State<PgPool>, user: User) -> Option<Status> {
+                let (owner,): (i32,) = query_as(&format!("SELECT owner FROM {} WHERE id = $1;", $table))
+                    .bind(id)
+                    .fetch_optional(&**db).await.unwrap()?;
+                if owner != user.id {
+                    return Some(Status::Forbidden);
+                }
+
+                $(
+                    if let Some(value) = &update.$field {
+                        query(&format!("UPDATE {} SET {} = $2 WHERE id = $1;", $table, stringify!($field)))
+                            .bind(id)
+                            .bind(value)
+                            .execute(&**db).await.unwrap();
+                    }
+                )*
+
+                Some(Status::NoContent)
+            }
+
+            #[delete($route_id)]
+            pub(super) async fn delete(id: i32, db: &State<PgPool>, user: User) -> Option<Status> {
+                let (owner,): (i32,) = query_as(&format!("SELECT owner FROM {} WHERE id = $1;", $table))
+                    .bind(id)
+                    .fetch_optional(&**db).await.unwrap()?;
+                if owner != user.id {
+                    return Some(Status::Forbidden);
+                }
+
+                query(&format!("DELETE FROM {} WHERE id = $1;", $table))
+                    .bind(id)
+                    .execute(&**db).await.unwrap();
+
+                Some(Status::NoContent)
+            }
+        }
+    };
+}
+
+crud!(document, "/document", "/document/<id>", "documents", {
     title: String,
     content: Option<serde_json::Value>,
-}
-
-impl TryFrom<PartialDocument> for Document {
-    type Error = ();
-
-    fn try_from(value: PartialDocument) -> Result<Self, Self::Error> {
-        Ok(Self {
-            title: value.title.ok_or(())?,
-            content: value.content,
-        })
-    }
-}
-
-#[derive(Deserialize)]
-struct PartialDocument {
-    title: Option<String>,
-    content: Option<serde_json::Value>,
-}
-
-impl From<Document> for PartialDocument {
-    fn from(value: Document) -> Self {
-        Self {
-            title: Some(value.title),
-            content: value.content,
-        }
-    }
-}
-
-#[get("/document/<id>")]
-async fn get_document(id: i32, db: &State<PgPool>, user: User) -> Option<Result<Json<Document>, Status>> {
-    let document = query!(/* language=sql */ "SELECT title, content, owner FROM documents WHERE id = $1;", id)
-        .fetch_optional(&**db).await.unwrap()?;
-    if document.owner != user.id {
-        return Some(Err(Status::Forbidden));
-    }
-    Some(Ok(Json(Document {
-        title: document.title,
-        content: document.content,
-    })))
-}
-
-#[patch("/document/<id>", data = "<document>")]
-async fn patch_document(id: i32, db: &State<PgPool>, document: Json<PartialDocument>, user: User) -> Status {
-    let owner = match query!(/* language=sql */ "SELECT owner FROM documents WHERE id = $1;", id)
-        .fetch_optional(&**db).await.unwrap() {
-        Some(document) => document.owner,
-        None => return Status::NotFound,
-    };
-    if owner != user.id {
-        return Status::Forbidden;
-    }
-    match &*document {
-        PartialDocument {title: Some(title), content: Some(content)} => {
-            query!(/* language=sql */ "UPDATE documents SET title = $1, content = $2 WHERE id = $3;", title, content, id)
-                .execute(&**db).await.unwrap();
-        }
-        PartialDocument {title: Some(title), content: None} => {
-            query!(/* language=sql */ "UPDATE documents SET title = $1 WHERE id = $2;", title, id)
-                .execute(&**db).await.unwrap();
-
-        }
-        PartialDocument {title: None, content: Some(content)} => {
-            query!(/* language=sql */ "UPDATE documents SET content = $1 WHERE id = $2;", content, id)
-                .execute(&**db).await.unwrap();
-
-        }
-        PartialDocument {title: None, content: None} => {}
-    };
-    Status::NoContent
-}
+});
 
 #[derive(Deserialize)]
 struct Login {
