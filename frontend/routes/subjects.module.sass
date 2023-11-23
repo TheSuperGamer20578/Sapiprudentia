@@ -1,0 +1,33 @@
+@import "../vars"
+
+.subjectList
+  list-style: none
+
+  li
+    margin-block: 1em
+
+    a
+      display: flex
+      flex: 1
+      text-decoration: none
+      padding: $padding
+      border-radius: $corners
+      background: $bg-placeholder
+      color: $fg-placeholder
+
+      &.active
+        background: $bg2
+        color: $fg
+
+.class
+  margin-left: 1em
+  color: $fg-placeholder
+
+  &::before, &::after
+    color: $fg-accent
+
+  &::before
+    content: "("
+
+  &::after
+    content: ")"

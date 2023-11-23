@@ -40,14 +40,14 @@ function throwForStatus(response: Response) {
     }
 }
 
-function crud<T>(endpoint: string) {
+function crud<T extends {id: number}>(endpoint: string) {
     return {
-        async list(id: number): Promise<T[]> {
+        async list(): Promise<T[]> {
             const response = await fetch(`${BASE_URL}${endpoint}`);
             throwForStatus(response);
             return await response.json();
         },
-        async create(data: T): Promise<number> {
+        async create(data: Omit<T, "id">): Promise<T> {
             const response = await fetch(`${BASE_URL}${endpoint}`, {
                 method: "POST",
                 body: JSON.stringify(data),
@@ -60,7 +60,7 @@ function crud<T>(endpoint: string) {
             throwForStatus(response);
             return await response.json();
         },
-        async update(id: number, data: Partial<T>): Promise<void> {
+        async update(id: number, data: Partial<Omit<T, "id">>): Promise<void> {
             const response = await fetch(`${BASE_URL}${endpoint}/${id}`, {
                 method: "PATCH",
                 body: JSON.stringify(data),
@@ -76,10 +76,33 @@ function crud<T>(endpoint: string) {
     };
 }
 
-export const {get: getDocument, update: updateDocument} = crud<{
+
+export interface Document {
+    id: number,
     title: string,
     content: object | null,
-}>("/document");
+    created_at: string,
+    last_modified: string,
+}
+export const {
+    get: getDocument,
+    update: updateDocument,
+} = crud<Document>("/document");
+
+export interface Subject {
+    id: number,
+    name: string,
+    class: string,
+    active: boolean,
+    google_classroom_id: string | null,
+}
+export const {
+    list: listSubjects,
+    create: createSubject,
+    get: getSubject,
+    update: updateSubject,
+    delete: deleteSubject,
+} = crud<Subject>("/subject");
 
 export async function login(login: string, password: string): Promise<User> {
     const response = await fetch(`${BASE_URL}/login`, {

@@ -4,6 +4,7 @@ import LoadingOverlay from "./components/loadingOverlay";
 import Centre from "./components/centre";
 import styles from "./auth.module.sass";
 import PubSub from "pubsub-js";
+import Form from "./components/form";
 
 export const AuthContext = React.createContext<User>(null!);
 
@@ -49,39 +50,43 @@ function LoginForm({setUser}: {setUser: (user: User) => void}) {
         <LoadingOverlay force={loading} />
         <div className={styles.bg}>
             <Centre>
-                <form className={styles.form} onSubmit={(e: FormEvent) => {
-                    e.preventDefault();
-                    setLoading(true);
-                    login(username, password)
-                        .then(setUser)
-                        .catch((e) => {
-                            if (e instanceof HttpError && e.response.status === 403) {
-                                setError("Invalid username or password.");
-                            } else {
-                                throw e;
-                            }
-                            setLoading(false);
-                        });
-                }}>
-                    <h1>Login</h1>
-                    {error !== null && <p className={styles.validation}>{error}</p>}
-                    <label>
-                        <p>Username or email:</p>
-                        <input type="text" required autoFocus onInput={(e: ChangeEvent<HTMLInputElement>) => {
-                            setUsername(e.currentTarget.value);
-                        }}/>
-                    </label>
-                    <label>
-                        <p>Password:</p>
-                        <input type="password" required onInput={(e: ChangeEvent<HTMLInputElement>) => {
-                            setPassword(e.currentTarget.value);
-                        }}/>
-                    </label>
-                    <input type="submit" content="Login" />
-                </form>
+                <div className={styles.form}>
+                    <Form
+                        title="Login"
+                        submitText="Login"
+                        submit={() => {
+                            setLoading(true);
+                            login(username, password)
+                                .then(setUser)
+                                .catch((e) => {
+                                    if (e instanceof HttpError && e.response.status === 403) {
+                                        setError("Invalid username or password.");
+                                    } else {
+                                        throw e;
+                                    }
+                                    setLoading(false);
+                                });
+                        }}
+                    >
+                        {error !== null && <p className={styles.validation}>{error}</p>}
+                        <label>
+                            <p>Username or email:</p>
+                            <input type="text" required autoFocus onInput={(e: ChangeEvent<HTMLInputElement>) => {
+                                setUsername(e.currentTarget.value);
+                            }}/>
+                        </label>
+                        <label>
+                            <p>Password:</p>
+                            <input type="password" required onInput={(e: ChangeEvent<HTMLInputElement>) => {
+                                setPassword(e.currentTarget.value);
+                            }}/>
+                        </label>
+                    </Form>
+                </div>
             </Centre>
         </div>
-    </>;
+    </>
+;
 }
 
 function PasswordChangeForm({setUser}: {setUser: (user: User) => void}) {
@@ -94,31 +99,34 @@ function PasswordChangeForm({setUser}: {setUser: (user: User) => void}) {
         <LoadingOverlay force={loading} />
         <div className={styles.bg}>
             <Centre>
-                <form className={styles.form} onSubmit={(e: FormEvent) => {
-                    e.preventDefault();
-                    if (password !== confirmPassword) {
-                        setError("Passwords do not match.");
-                        return;
-                    }
-                    setLoading(true);
-                    updateUser({password}).then(() => current_user().then(setUser));
-                }}>
-                    <h1>Update Password</h1>
-                    {error !== null && <p className={styles.validation}>{error}</p>}
-                    <label>
-                        <p>Password:</p>
-                        <input type="password" required autoFocus onInput={(e: ChangeEvent<HTMLInputElement>) => {
-                            setPassword(e.currentTarget.value);
-                        }}/>
-                    </label>
-                    <label>
-                        <p>Confirm Password:</p>
-                        <input type="password" required onInput={(e: ChangeEvent<HTMLInputElement>) => {
-                            setConfirmPassword(e.currentTarget.value);
-                        }}/>
-                    </label>
-                    <input type="submit" content="Save" />
-                </form>
+                <div className={styles.form}>
+                    <Form
+                        title="Update Password"
+                        submitText="Save"
+                        submit={() => {
+                            if (password !== confirmPassword) {
+                                setError("Passwords do not match.");
+                                return;
+                            }
+                            setLoading(true);
+                            updateUser({password}).then(() => current_user().then(setUser));
+                        }}
+                    >
+                        {error !== null && <p className={styles.validation}>{error}</p>}
+                        <label>
+                            <p>Password:</p>
+                            <input type="password" required autoFocus onInput={(e: ChangeEvent<HTMLInputElement>) => {
+                                setPassword(e.currentTarget.value);
+                            }}/>
+                        </label>
+                        <label>
+                            <p>Confirm Password:</p>
+                            <input type="password" required onInput={(e: ChangeEvent<HTMLInputElement>) => {
+                                setConfirmPassword(e.currentTarget.value);
+                            }}/>
+                        </label>
+                    </Form>
+                </div>
             </Centre>
         </div>
     </>;

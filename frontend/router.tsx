@@ -7,6 +7,7 @@ import ErrorPage from "./routes/error";
 import EditorPage from "./routes/editorPage";
 import {AuthProvider} from "./auth";
 import LoadingOverlay from "./components/loadingOverlay";
+import SubjectsPage from "./routes/subjects";
 
 const router = createBrowserRouter([
     {
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
             {
                 path: "/document/:id",
                 element: <EditorPage />,
+            },
+            {
+                path: "/subjects",
+                element: <SubjectsPage />,
             }
         ],
     },

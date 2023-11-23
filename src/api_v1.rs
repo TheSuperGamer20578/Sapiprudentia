@@ -14,6 +14,11 @@ lazy_static! {
     pub static ref ROUTES: Vec<Route> = routes![
         document::get,
         document::update,
+        subject::list,
+        subject::create,
+        subject::get,
+        subject::update,
+        subject::delete,
         login,
         current_user,
         logout,
@@ -74,12 +79,12 @@ macro_rules! crud {
             }
 
             #[post($route, data = "<create>")]
-            pub(super) async fn create(create: Json<Create>, db: &State<PgPool>, user: User) -> Status {
-                query(&format!("INSERT INTO {} (owner, {}) VALUES ($1, {});", $table, stringify!($($field),*), vec! [$(stringify!($field)),*].iter().enumerate().map(|(i, _)| format!("${}", i + 2)).join(", ")))
+            pub(super) async fn create(create: Json<Create>, db: &State<PgPool>, user: User) -> Json<Send> {
+                let new: Full = query_as(&format!("INSERT INTO {} (owner, {}) VALUES ($1, {}) RETURNING *;", $table, stringify!($($field),*), vec! [$(stringify!($field)),*].iter().enumerate().map(|(i, _)| format!("${}", i + 2)).join(", ")))
                     .bind(user.id)
                     $(.bind(&create.$field))*
-                    .execute(&**db).await.unwrap();
-                Status::NoContent
+                    .fetch_one(&**db).await.unwrap();
+                Json(new.into())
             }
 
             #[get($route_id)]
@@ -138,6 +143,13 @@ crud!(document, "/document", "/document/<id>", "documents", {
     content: Option<serde_json::Value>,
 });
 
+crud!(subject, "/subject", "/subject/<id>", "subjects", {
+    name: String,
+    class: String,
+    active: bool,
+    google_classroom_id: Option<String>,
+});
+
 #[derive(Deserialize)]
 struct Login {
     login: String,
@@ -149,7 +161,7 @@ async fn login(login: Json<Login>, cookie_jar: &CookieJar<'_>, db: &State<PgPool
     if auth.is_some() {
         return Err(Status::BadRequest);
     }
-    let Some(user) = query!(/* language=sql */ "SELECT * FROM users WHERE username = $1 OR email = $1;", login.login)
+    let Some(user) = query!(/* language=postgresql */ "SELECT * FROM users WHERE username = $1 OR email = $1;", login.login)
        .fetch_optional(&**db).await.unwrap() else {
         return Err(Status::Forbidden);
     };
@@ -158,7 +170,7 @@ async fn login(login: Json<Login>, cookie_jar: &CookieJar<'_>, db: &State<PgPool
         Err(err) => Err(err).unwrap(),
         Ok(()) => {},
     }
-    let token = query!(/* language=sql */ "
+    let token = query!(/* language=postgresql */ "
         INSERT INTO sessions (user_id, last_seen, last_ip, last_user_agent)
         VALUES ($1, NOW(), $2, $3)
         RETURNING id;
