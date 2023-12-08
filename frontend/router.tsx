@@ -8,6 +8,7 @@ import EditorPage from "./routes/editorPage";
 import {AuthProvider} from "./auth";
 import LoadingOverlay from "./components/loadingOverlay";
 import SubjectsPage from "./routes/subjects";
+import SubjectPage from "./routes/subjectPage";
 
 const router = createBrowserRouter([
     {
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
             {
                 path: "/subjects",
                 element: <SubjectsPage />,
+            },
+            {
+                path: "/subjects/:id",
+                element: <SubjectPage />,
             }
         ],
     },

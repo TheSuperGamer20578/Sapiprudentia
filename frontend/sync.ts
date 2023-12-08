@@ -1,11 +1,22 @@
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
+import {useBeforeUnload} from "react-router-dom";
 
 const UPDATE_INTERVAL_MS = 2500;
 
-export function useSync<I, T>(id: I, initial: (id: I) => Promise<T>, sync: (id: I, value: Partial<T>) => Promise<void>, interval_ms: number = UPDATE_INTERVAL_MS): [T | undefined, boolean, (value: Partial<T>) => void] {
+export function useSync<I, T>(
+    id: I,
+    initial: (id: I) => Promise<T>,
+    sync: (id: I, value: Partial<T>) => Promise<void>,
+    interval_ms: number = UPDATE_INTERVAL_MS,
+): {
+    value: T | undefined,
+    pending: boolean,
+    update: (value: Partial<T>) => void,
+} {
     const [value, setValue] = useState<T | undefined>(undefined);
     const [pending, setPending] = useState<Partial<T>>({});
     useEffect(() => {
+        setValue(undefined);
         initial(id).then(setValue);
         const interval = setInterval(() => setPending((current) => {
             if (Object.keys(current).length !== 0) {
@@ -14,24 +25,38 @@ export function useSync<I, T>(id: I, initial: (id: I) => Promise<T>, sync: (id: 
             return {};
         }), interval_ms);
         return () => clearInterval(interval);
-    }, []);
-    return [value, Object.keys(pending).length !== 0, (value: Partial<T>) => {
-        setPending((current) => ({...current, ...value}));
-        if (value === undefined) {
-            console.warn("Attempted to set value before initial value was loaded");
-            return;
+    }, [id]);
+    useBeforeUnload(
+        useCallback((e) => {
+            if (Object.keys(pending).length !== 0) {
+                e.preventDefault();
+                return true;
+            }
+            return false;
+        }, [pending])
+    );
+    return {
+        value,
+        pending: Object.keys(pending).length !== 0,
+        update: (value: Partial<T>) => {
+            setPending((current) => ({...current, ...value}));
+            if (value === undefined) {
+                console.warn("Attempted to set value before initial value was loaded");
+                return;
+            }
+            setValue((current) => ({...current!, ...value}));
         }
-        setValue((current) => ({...current!, ...value}));
-    }];
+    };
 }
 
 export function useSyncMany<I, T>(
     initial: () => Promise<(T & {id: I})[]>,
     sync: (id: I, value: Partial<T>) => Promise<void>,
     add: (value: T) => Promise<T & {id: I}>,
-    interval_ms: number = UPDATE_INTERVAL_MS): {
+    interval_ms: number = UPDATE_INTERVAL_MS,
+): {
         value: Map<I, T & {id: I}> | undefined,
-        clean: boolean,
+        pending: boolean,
         update: (id: I, value: Partial<T>) => void,
         add: (value: T) => void,
 } {
@@ -51,7 +76,7 @@ export function useSyncMany<I, T>(
     }, []);
     return {
         value,
-        clean: pending.size !== 0,
+        pending: pending.size !== 0,
         update: (id: I, value: Partial<T>) => {
             setPending((current) => (new Map(current)).set(id, {...current.get(id), ...value}));
             if (value === undefined) {

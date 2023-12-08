@@ -67,7 +67,11 @@ interface Props {
 }
 
 export default function Editor({ documentId, showTitle, autofocus }: Props) {
-    const [doc, pending, setDoc] = useSync(documentId, getDocument, updateDocument);
+    const {
+        value: doc,
+        pending,
+        update: setDoc,
+    } = useSync(documentId, getDocument, updateDocument);
     const [loading, setLoading] = useState(true);
 
     if (doc === undefined) {

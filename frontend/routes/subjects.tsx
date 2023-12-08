@@ -6,6 +6,9 @@ import {Link} from "react-router-dom";
 import styles from "./subjects.module.sass";
 import Modal from "../components/modal";
 import Form from "../components/form";
+import IconButton from "../components/iconButton";
+import {FaPlus} from "react-icons/fa";
+import Corner from "../components/corner";
 
 export default function Subjects() {
     const {
@@ -54,17 +57,18 @@ export default function Subjects() {
                 </label>
             </Form>
         </Modal>
-        <h1>Subjects</h1>
-        <ul className={styles.subjectList}>
-            {Array.from(subjects.values()).map((subject) =>
-                <li key={subject.id}>
-                    <Link to={`/subjects/${subject.id}`} className={subject.active && styles.active}>
-                        <p>{subject.name}</p>
-                        <p className={styles.class}>{subject.class}</p>
-                    </Link>
-                </li>
-            )}
-        </ul>
-        <button onClick={() => setCreateModalOpen(true)}>New</button>
+        <Corner corner={<IconButton onClick={() => setCreateModalOpen(true)}><FaPlus /></IconButton>}>
+            <h1>Subjects</h1>
+            <ul className={styles.subjectList}>
+                {Array.from(subjects.values()).map((subject) =>
+                    <li key={subject.id}>
+                        <Link to={`/subjects/${subject.id}`} className={subject.active && styles.active}>
+                            <p>{subject.name}</p>
+                            <p className={styles.class}>{subject.class}</p>
+                        </Link>
+                    </li>
+                )}
+            </ul>
+        </Corner>
     </>;
 }
