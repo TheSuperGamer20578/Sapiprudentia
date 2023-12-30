@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.75"
 argon2 = { version = "0.5.2", features = ["std"] }
-chrono = "0.4.31"
+chrono = { version = "0.4.31", features = ["serde"] }
 email_address = "0.2.4"
 itertools = "0.12.0"
 lazy_static = "1.4.0"

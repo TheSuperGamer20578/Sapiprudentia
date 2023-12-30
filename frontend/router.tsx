@@ -6,9 +6,9 @@ import Index from "./routes";
 import ErrorPage from "./routes/error";
 import EditorPage from "./routes/editorPage";
 import {AuthProvider} from "./auth";
-import LoadingOverlay from "./components/loadingOverlay";
 import SubjectsPage from "./routes/subjects";
 import SubjectPage from "./routes/subjectPage";
+import Todos from "./routes/todos";
 
 const router = createBrowserRouter([
     {
@@ -31,7 +31,11 @@ const router = createBrowserRouter([
             {
                 path: "/subjects/:id",
                 element: <SubjectPage />,
-            }
+            },
+            {
+                path: "/todo",
+                element: <Todos />,
+            },
         ],
     },
 ]);

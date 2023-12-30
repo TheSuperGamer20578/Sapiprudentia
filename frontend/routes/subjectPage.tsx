@@ -8,6 +8,7 @@ import {AiOutlineStar} from "react-icons/ai";
 import styles from "./subjectPage.module.sass";
 import Corner from "../components/corner";
 import IconButton from "../components/iconButton";
+import TodoList from "../components/todoList";
 
 export default function SubjectPage() {
     const { id } = useParams();
@@ -26,10 +27,16 @@ export default function SubjectPage() {
         <div className={styles.block}>
             <Corner corner={
                 <>
-                    <IconButton onClick={() => setSubject({active: !subject?.active})}>
+                    <IconButton
+                        title={subject.active ? "Remove from sidebar" : "Add to sidebar"}
+                        onClick={() => setSubject({active: !subject?.active})}
+                    >
                         {subject.active ? <FaStar /> : <AiOutlineStar />}
                     </IconButton>
-                    <IconButton onClick={() => setEditable(!editable)}>
+                    <IconButton
+                        title={editable ? "Lock" : "Edit"}
+                        onClick={() => setEditable(!editable)}
+                    >
                         {editable ? <FaLock /> : <FaEdit />}
                     </IconButton>
                 </>
@@ -61,5 +68,8 @@ export default function SubjectPage() {
                 </>}
             </Corner>
         </div>
+        <TodoList subject={subject.id}>
+            <h2>{"Todo"}</h2>
+        </TodoList>
     </>;
 }

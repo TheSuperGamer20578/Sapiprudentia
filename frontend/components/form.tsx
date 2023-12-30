@@ -16,7 +16,7 @@ export default function Form({submit, title, submitText, children}: Props) {
         }}>
             <h1>{title}</h1>
             {children}
-            <input type="submit" content={submitText}/>
+            <input type="submit" value={submitText}/>
         </form>
     );
 }

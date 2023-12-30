@@ -8,6 +8,7 @@ use rocket::http::{Cookie, CookieJar, Status};
 use rocket::serde::json::Json;
 use serde::{Deserialize};
 use sqlx::{PgPool, query};
+use chrono::NaiveDate;
 use crate::auth::{ARGON2, Identity, User};
 
 lazy_static! {
@@ -23,11 +24,25 @@ lazy_static! {
         current_user,
         logout,
         update_current_user,
+        todo::list,
+        todo::create,
+        todo::get,
+        todo::update,
+        todo::delete,
     ];
 }
 
 macro_rules! crud {
-    ($module:ident, $route:literal, $route_id:literal, $table:literal, {$($field:ident: $field_type:ty),*$(,)?}) => {
+    ($module:ident, $route:literal, $route_id:literal, $table:literal, {
+        $(
+            $(#[$attr:meta])*
+            $(->[$send_attr:meta])*
+            $(+[$create_attr:meta])*
+            $(<-[$update_attr:meta])*
+            $field:ident: $field_type:ty
+        ),*$(,)?
+    }
+    ) => {
         #[allow(dead_code)]  // rocket emitts structs
         #[allow(unused_imports)]  // and imports
         mod $module {
@@ -38,18 +53,26 @@ macro_rules! crud {
             use serde::{Serialize, Deserialize};
             use itertools::Itertools;
             use crate::auth::User;
+            use super::*;
 
             #[derive(FromRow)]
             pub(super) struct Full {
                 id: i32,
                 owner: i32,
-                $($field: $field_type),*
+                $(
+                    $(#[$attr])*
+                    $field: $field_type,
+                )*
             }
 
             #[derive(Serialize, FromRow)]
             pub(super) struct Send {
                 id: i32,
-                $($field: $field_type),*
+                $(
+                    $(#[$attr])*
+                    $(#[$send_attr])*
+                    $field: $field_type,
+                )*
             }
 
             impl From<Full> for Send {
@@ -63,12 +86,20 @@ macro_rules! crud {
 
             #[derive(Deserialize)]
             pub(super) struct Create {
-                $($field: $field_type),*
+                $(
+                    $(#[$attr])*
+                    $(#[$create_attr])*
+                    $field: $field_type,
+                )*
             }
 
             #[derive(Deserialize)]
             pub(super) struct Update {
-                $($field: Option<$field_type>),*
+                $(
+                    $(#[$attr])*
+                    $(#[$update_attr])*
+                    $field: Option<$field_type>,
+                )*
             }
 
             #[get($route)]
@@ -148,6 +179,15 @@ crud!(subject, "/subject", "/subject/<id>", "subjects", {
     class: String,
     active: bool,
     google_classroom_id: Option<String>,
+});
+
+crud!(todo, "/todo", "/todo/<id>", "todos", {
+    title: String,
+    completed: bool,
+    subject: Option<i32>,
+    parent: Option<i32>,
+    due: Option<NaiveDate>,
+    archived: bool,
 });
 
 #[derive(Deserialize)]

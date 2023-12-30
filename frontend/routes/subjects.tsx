@@ -1,4 +1,4 @@
-import {createSubject, listSubjects, updateSubject} from "../api";
+import {createSubject, deleteSubject, listSubjects, updateSubject} from "../api";
 import LoadingOverlay from "../components/loadingOverlay";
 import React, {useState} from "react";
 import {useSyncMany} from "../sync";
@@ -14,7 +14,7 @@ export default function Subjects() {
     const {
         value: subjects,
         add: addSubject,
-    } = useSyncMany(listSubjects, updateSubject, createSubject, 0);
+    } = useSyncMany(listSubjects, updateSubject, createSubject, deleteSubject, 0);
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [createName, setCreateName] = useState("");
     const [createClass, setCreateClass] = useState("");
@@ -57,7 +57,7 @@ export default function Subjects() {
                 </label>
             </Form>
         </Modal>
-        <Corner corner={<IconButton onClick={() => setCreateModalOpen(true)}><FaPlus /></IconButton>}>
+        <Corner corner={<IconButton title="Create subject" onClick={() => setCreateModalOpen(true)}><FaPlus /></IconButton>}>
             <h1>Subjects</h1>
             <ul className={styles.subjectList}>
                 {Array.from(subjects.values()).map((subject) =>

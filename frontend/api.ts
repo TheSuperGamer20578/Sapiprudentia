@@ -1,4 +1,5 @@
 import PubSub from "pubsub-js";
+import FormatDate from "./date";
 
 export const API_VERSION = 1;
 const BASE_URL = `/api/v${API_VERSION}`;
@@ -40,23 +41,41 @@ function throwForStatus(response: Response) {
     }
 }
 
-function crud<T extends {id: number}>(endpoint: string) {
+function crud<T extends object & {id: number}>(endpoint: string, deserialize?: Partial<{[K in keyof T]: (value: unknown) => T[K]}>) {
     return {
         async list(): Promise<T[]> {
-            const response = await fetch(`${BASE_URL}${endpoint}`);
+            const response = await fetch(`${BASE_URL}${endpoint}`, {
+                headers: {
+                    accept: "application/json",
+                },
+            });
             throwForStatus(response);
-            return await response.json();
+            return (await response.json() as {[K in keyof T]: unknown}[])
+                .map((item) => {
+                    for (const [key, deserializer] of Object.entries(deserialize ?? {})) {
+                        item[key as keyof T] = deserializer(item[key as keyof T]);
+                    }
+                    return item as T;
+                });
         },
         async create(data: Omit<T, "id">): Promise<T> {
             const response = await fetch(`${BASE_URL}${endpoint}`, {
                 method: "POST",
                 body: JSON.stringify(data),
+                headers: {
+                    "content-type": "application/json",
+                    accept: "application/json",
+                },
             });
             throwForStatus(response);
             return await response.json();
         },
         async get(id: number): Promise<T> {
-            const response = await fetch(`${BASE_URL}${endpoint}/${id}`);
+            const response = await fetch(`${BASE_URL}${endpoint}/${id}`, {
+                headers: {
+                    accept: "application/json",
+                },
+            });
             throwForStatus(response);
             return await response.json();
         },
@@ -64,6 +83,9 @@ function crud<T extends {id: number}>(endpoint: string) {
             const response = await fetch(`${BASE_URL}${endpoint}/${id}`, {
                 method: "PATCH",
                 body: JSON.stringify(data),
+                headers: {
+                    "content-type": "application/json",
+                },
             });
             throwForStatus(response);
         },
@@ -103,6 +125,23 @@ export const {
     update: updateSubject,
     delete: deleteSubject,
 } = crud<Subject>("/subject");
+
+export interface Todo {
+    id: number,
+    title: string,
+    completed: boolean,
+    subject?: number,
+    parent?: number,
+    due?: FormatDate,
+    archived: boolean,
+}
+export const {
+    list: listTodos,
+    create: createTodo,
+    get: getTodo,
+    update: updateTodo,
+    delete: deleteTodo,
+} = crud<Todo>("/todo", {due: (value) => FormatDate.fromString(value as string) ?? undefined});
 
 export async function login(login: string, password: string): Promise<User> {
     const response = await fetch(`${BASE_URL}/login`, {

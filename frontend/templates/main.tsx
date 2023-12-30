@@ -30,11 +30,7 @@ export default function LayoutMain() {
                 </Dropdown>
                 <nav>
                     <ul className={[styles.navList, styles.borderTop].join(" ")}>
-                        <li><a href="#">lorem</a></li>
-                        <li><a href="#">ipsum</a></li>
-                        <li><a href="#">dolor</a></li>
-                        <li><a href="#">sit</a></li>
-                        <li><a href="#">amet</a></li>
+                        <li><Link to="/todo">{"Todo"}</Link></li>
                     </ul>
                     <ul className={[styles.navList, styles.borderTop].join(" ")}>
                         {subjects.map((subject) =>
