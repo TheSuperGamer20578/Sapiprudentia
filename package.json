@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "build": "webpack",
-    "dev": "SKIP_SERVICEWORKER=true webpack serve"
+    "dev": "SKIP_SERVICEWORKER=true webpack serve",
+    "deploy": "npm run build -- --mode production && cargo shuttle deploy"
   },
   "devDependencies": {
     "@types/node": "^20.8.9",

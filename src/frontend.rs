@@ -17,7 +17,7 @@ async fn react() -> Template {
 
 // TODO: Refactor this
 #[cfg(not(skip_webpack))]
-struct ServiceWorker(&'static str);
+pub struct ServiceWorker(&'static str);
 
 #[cfg(not(skip_webpack))]
 impl<'r> Responder<'r, 'r> for ServiceWorker {
@@ -33,5 +33,5 @@ impl<'r> Responder<'r, 'r> for ServiceWorker {
 #[cfg(not(skip_webpack))]
 #[get("/static/serviceworker.js")]
 pub async fn serviceworker() -> ServiceWorker {
-    ServiceWorker(include_str!(concat!(env!("OUT_DIR"), "/serviceworker.js")))
+    ServiceWorker(include_str!("../dist/serviceworker.js"))
 }

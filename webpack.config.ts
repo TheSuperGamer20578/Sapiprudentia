@@ -5,6 +5,9 @@ import WebpackCopyPlugin from "copy-webpack-plugin";
 import WorkboxPlugin from "workbox-webpack-plugin";
 
 const config: Configuration = {
+    output: {
+        clean: true,
+    },
     plugins: [
         new MiniCssExtractPlugin(),
         new WebpackCopyPlugin({
