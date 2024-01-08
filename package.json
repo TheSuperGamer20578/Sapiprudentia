@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "build": "webpack",
-    "dev": "webpack serve"
+    "dev": "SKIP_SERVICEWORKER=true webpack serve"
   },
   "devDependencies": {
     "@types/node": "^20.8.9",
@@ -12,6 +12,7 @@
     "@types/react-dom": "^18.2.15",
     "@types/react-gravatar": "^2.6.13",
     "@types/webpack": "^5.28.4",
+    "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.8.1",
     "mini-css-extract-plugin": "^2.7.6",
     "sass": "^1.69.4",
@@ -23,7 +24,10 @@
     "typescript-plugin-css-modules": "^5.0.2",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.15.1"
+    "webpack-dev-server": "^4.15.1",
+    "workbox-precaching": "^7.0.0",
+    "workbox-routing": "^7.0.0",
+    "workbox-webpack-plugin": "^7.0.0"
   },
   "dependencies": {
     "@tiptap-pro/extension-details": "^2.3.3",

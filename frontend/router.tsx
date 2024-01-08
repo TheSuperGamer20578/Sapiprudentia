@@ -10,6 +10,12 @@ import SubjectsPage from "./routes/subjects";
 import SubjectPage from "./routes/subjectPage";
 import Todos from "./routes/todos";
 
+try {
+    await navigator.serviceWorker.register("/static/serviceworker.js", {scope: "/"});
+} catch (e) {
+    console.warn("Error registering service worker:", e);
+}
+
 const router = createBrowserRouter([
     {
         path: "/",

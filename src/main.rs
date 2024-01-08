@@ -1,10 +1,11 @@
 #![warn(clippy::pedantic)]
 
 mod api_v1;
-mod react;
+mod frontend;
 mod auth;
 
-use rocket::fs::{FileServer, relative};
+use rocket::fs::FileServer;
+use rocket::routes;
 use rocket_dyn_templates::Template;
 use sqlx::PgPool;
 
@@ -14,12 +15,15 @@ async fn main(
 ) -> shuttle_rocket::ShuttleRocket {
     sqlx::migrate!().run(&db).await.unwrap();
 
-    Ok(rocket::build()
-        .mount("/static", FileServer::from(relative!("/static")).rank(10))
-        .mount("/static", FileServer::from(relative!("/dist")).rank(11))
+    let mut rocket = rocket::build()
         .mount("/api/v1", &**api_v1::ROUTES)
-        .mount("/", &**react::ROUTES)
+        .mount("/", &**frontend::ROUTES)
         .manage(db)
-        .attach(Template::fairing())
-        .into())
+        .attach(Template::fairing());
+    #[cfg(not(skip_webpack))] {
+        rocket = rocket
+            .mount("/static", FileServer::from(env!("OUT_DIR")))
+            .mount("/", routes![frontend::serviceworker]);
+    }
+    Ok(rocket.into())
 }

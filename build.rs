@@ -7,6 +7,8 @@ fn main() {
     println!("cargo:rerun-if-env-changed=SKIP_WEBPACK");
     println!("cargo:rerun-if-changed=migrations");
     if env::var("SKIP_WEBPACK").is_ok() {
+        println!("cargo:warning=Skipping webpack build");
+        println!("cargo:rustc-cfg=skip_webpack");
         return;
     }
     println!("cargo:rerun-if-changed=frontend");
@@ -32,7 +34,7 @@ fn main() {
             "Run npm build",
             CommandBuilder::new_with_args(
                 &*npm,
-                &["run", "build", "--mode", mode, "--color"],
+                &["run", "build", "--mode", mode, "--color", "--output-path", &env::var("OUT_DIR").unwrap()],
             ).into(),
         );
 }
