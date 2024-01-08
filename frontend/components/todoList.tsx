@@ -188,7 +188,7 @@ function Todo({todo, nested, setCreateParent, setCreateModalOpen, setCreateEdit,
                     <FaBook/>
                     <p>{subjectName}</p>
                 </Chip>}
-            {todo.due !== null && <Chip><FaCalendar/><p>{todo.due?.toRelativeOrAbsoluteString()}</p></Chip>}
+            {todo.due !== undefined && <Chip><FaCalendar/><p>{todo.due?.toRelativeOrAbsoluteString()}</p></Chip>}
         </div>
         <ul className={styles.nestList}>
             {Array.from(todos.values()).filter((t) => t.parent === todo.id).map((todo) =>

@@ -141,7 +141,7 @@ export const {
     get: getTodo,
     update: updateTodo,
     delete: deleteTodo,
-} = crud<Todo>("/todo", {due: (value) => FormatDate.fromString(value as string) ?? undefined});
+} = crud<Todo>("/todo", {due: (value) => FormatDate.fromString(value as string | null) ?? undefined});
 
 export async function login(login: string, password: string): Promise<User> {
     const response = await fetch(`${BASE_URL}/login`, {
