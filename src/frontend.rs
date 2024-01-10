@@ -30,7 +30,7 @@ impl<'r> Responder<'r, 'r> for ServiceWorker {
     }
 }
 
-#[cfg(not(skip_webpack))]
+#[cfg(not(debug_assertions))]
 #[get("/static/serviceworker.js")]
 pub async fn serviceworker() -> ServiceWorker {
     ServiceWorker(include_str!("../dist/serviceworker.js"))

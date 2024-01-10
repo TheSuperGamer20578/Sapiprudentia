@@ -25,7 +25,7 @@ async fn main(
         .mount("/", &**frontend::ROUTES)
         .manage(db)
         .attach(Template::fairing());
-    #[cfg(not(skip_webpack))] {
+    #[cfg(not(debug_assertions))] {
         rocket = rocket
             .mount("/static", FileServer::from(relative!("dist")))
             .mount("/", routes![frontend::serviceworker]);

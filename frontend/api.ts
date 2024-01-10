@@ -1,5 +1,6 @@
 import PubSub from "pubsub-js";
 import FormatDate from "./date";
+import {objectMap} from "./util";
 
 export const API_VERSION = 1;
 const BASE_URL = `/api/v${API_VERSION}`;
@@ -27,6 +28,7 @@ export class HttpError extends Error {
 
 export class UnauthorizedError extends HttpError {
     constructor(response: Response) {
+        window.faro.api.resetUser();
         PubSub.publish("login_required", null);
         super(response);
     }
@@ -39,6 +41,15 @@ function throwForStatus(response: Response) {
     if (!response.ok) {
         throw new HttpError(response);
     }
+}
+
+function setUser(user: User) {
+    window.faro.api.setUser({
+        email: user.email,
+        id: user.id.toString(),
+        username: user.username,
+        attributes: objectMap<User, Record<string, string>>(user, (key, value) => [key, value.toString()]),
+    });
 }
 
 function crud<T extends object & {id: number}>(endpoint: string, deserialize?: Partial<{[K in keyof T]: (value: unknown) => T[K]}>) {
@@ -149,13 +160,17 @@ export async function login(login: string, password: string): Promise<User> {
         body: JSON.stringify({ login, password }),
     });
     throwForStatus(response);
-    return await response.json();
+    const user: User = await response.json();
+    setUser(user);
+    return user;
 }
 
 export async function current_user(): Promise<User> {
     const response = await fetch(`${BASE_URL}/login`);
     throwForStatus(response);
-    return await response.json();
+    const user: User = await response.json();
+    setUser(user);
+    return user;
 }
 
 export async function logout(): Promise<void> {
@@ -163,6 +178,7 @@ export async function logout(): Promise<void> {
         method: "DELETE",
     });
     throwForStatus(response);
+    window.faro.api.resetUser();
     PubSub.publish("login_required", null);
 }
 
