@@ -1,0 +1,11 @@
+query Layout {
+    currentUser {
+        name
+        email
+    }
+    subjects {
+        id
+        name
+        active
+    }
+}

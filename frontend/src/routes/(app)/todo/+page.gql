@@ -1,0 +1,20 @@
+query Todo {
+    todos @list(name: "todos") {
+        id
+        title
+        subject {
+            id
+            name
+        }
+        archived
+        completed
+        due
+        parent {
+            id
+        }
+    }
+    subjects {
+        id
+        name
+    }
+}

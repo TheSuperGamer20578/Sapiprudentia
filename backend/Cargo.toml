@@ -1,0 +1,30 @@
+[package]
+name = "sapiprudentia"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.75"
+argon2 = { version = "0.5.2", features = ["std"] }
+async-graphql = { version = "7.0.0", optional = true, features = ["chrono"] }
+async-graphql-rocket = { version = "7.0.0", optional = true }
+chrono = { version = "0.4.31", features = ["serde"] }
+email_address = "0.2.4"
+itertools = "0.12.0"
+lazy_static = "1.4.0"
+rocket = { version = "0.5.0-rc.2", features = ["json", "secrets"] }
+rocket_cors = "0.6.0"
+serde = "1.0.189"
+serde_json = "1.0.107"
+serde_with = "3.4.0"
+shuttle-rocket = "0.29.0"
+shuttle-runtime = "0.29.0"
+shuttle-secrets = "0.29.0"
+shuttle-shared-db = { version = "0.29.0", features = ["postgres-rustls"] }
+sqlx = { version = "0.7.2", features = ["postgres", "macros", "chrono"] }
+tokio = "1.26.0"
+
+[features]
+default = ["api_graphql"]
+api_v1 = []
+api_graphql = ["async-graphql", "async-graphql-rocket"]
