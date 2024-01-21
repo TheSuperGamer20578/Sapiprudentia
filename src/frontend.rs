@@ -10,7 +10,7 @@ lazy_static! {
     ];
 }
 
-#[get("/<_..>", rank = 1000)]
+#[get("/<_..>", format = "text/html", rank = 1000)]
 async fn react() -> Template {
     Template::render("react", context! {})
 }

@@ -1,14 +1,19 @@
 #![warn(clippy::pedantic)]
+#![warn(clippy::unwrap_used)]
 
-mod api_v1;
 mod frontend;
 mod auth;
+mod api;
 
+#[cfg(not(debug_assertions))]
 use rocket::fs::{FileServer, relative};
-use rocket::{Config, routes};
+#[cfg(not(debug_assertions))]
+use rocket::routes;
+use rocket::Config;
 use rocket_dyn_templates::Template;
 use shuttle_secrets::SecretStore;
 use sqlx::PgPool;
+use crate::api::graphql::create_schema;
 
 #[shuttle_runtime::main]
 async fn main(
@@ -17,14 +22,24 @@ async fn main(
 ) -> shuttle_rocket::ShuttleRocket {
     sqlx::migrate!().run(&db).await.unwrap();
 
+    #[allow(unused_mut)]
     let mut rocket = rocket::build()
         .configure(Config::figment()
             .merge(("secret_key", secrets.get("SECRET_KEY").unwrap()))
         )
-        .mount("/api/v1", &**api_v1::ROUTES)
         .mount("/", &**frontend::ROUTES)
-        .manage(db)
+        .mount("/api/auth", &**auth::ROUTES)
+        .manage(db.clone())
         .attach(Template::fairing());
+    #[cfg(feature = "api_v1")] {
+        rocket = rocket
+            .mount("/api/v1", &**api::v1::ROUTES);
+    }
+    #[cfg(feature = "api_graphql")] {
+        rocket = rocket
+            .manage(create_schema(db))
+            .mount("/api/graphql", &**api::graphql::ROUTES);
+    }
     #[cfg(not(debug_assertions))] {
         rocket = rocket
             .mount("/static", FileServer::from(relative!("dist")))

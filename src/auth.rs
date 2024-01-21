@@ -1,15 +1,21 @@
 use std::net::IpAddr;
 use anyhow::{anyhow};
-use argon2::Argon2;
+use argon2::{Argon2, PasswordHash, PasswordVerifier};
 use chrono::NaiveDateTime;
 use lazy_static::lazy_static;
-use rocket::{async_trait, Request};
-use rocket::http::{Cookie, Status};
+use rocket::{async_trait, delete, get, post, Request, Route, routes, State};
+use rocket::http::{Cookie, CookieJar, Status};
 use rocket::request::{FromRequest, Outcome};
+use rocket::serde::json::Json;
 use serde::{Deserialize, Deserializer, Serialize};
-use sqlx::{query, query_as};
+use sqlx::{PgPool, query, query_as};
 
 lazy_static! {
+    pub static ref ROUTES: Vec<Route> = routes![
+        login,
+        current_user,
+        logout,
+    ];
     pub static ref ARGON2: Argon2<'static> = Argon2::default();
 }
 
@@ -36,10 +42,8 @@ impl From<i32> for AccountType {
     /// # Panics
     /// If the value is not a valid account type.
     fn from(value: i32) -> Self {
-        if value < u8::MIN as i32 || value > u8::MAX as i32 {
-            panic!("Invalid account type: {value}");
-        }
-        Self::try_from(value as u8).unwrap()
+        assert!(!(value < i32::from(u8::MIN) || value > i32::from(u8::MAX)), "Invalid account type: {value}");
+        Self::try_from(u8::try_from(value).unwrap()).unwrap()
     }
 }
 
@@ -51,7 +55,7 @@ impl Serialize for AccountType {
 
 impl<'d> Deserialize<'d> for AccountType {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'d> {
-        Ok(Self::try_from(u8::deserialize(deserializer)?).map_err(serde::de::Error::custom)?)
+        Self::try_from(u8::deserialize(deserializer)?).map_err(serde::de::Error::custom)
     }
 }
 
@@ -69,22 +73,24 @@ pub struct User {
 impl User {
     async fn from_request_inner(request: &Request<'_>) -> anyhow::Result<Outcome<Self, anyhow::Error>> {
         let Some(token) = request.cookies().get_private("session") else {
-            return Ok(Outcome::Failure((Status::Unauthorized, anyhow!("No session cookie"))));
+            return Ok(Outcome::Error((Status::Unauthorized, anyhow!("No session cookie"))));
         };
         let identity = request.guard::<Identity<'_>>().await.unwrap();
         let Some(user_id) = query!(/* language=postgresql */ "
             UPDATE sessions
-            SET last_seen = NOW(), last_ip = $2, last_user_agent = $3 WHERE id = $1
+            SET last_seen = NOW(), last_ip = $2, last_user_agent = $3
+            WHERE id = $1
             RETURNING user_id;
             ", token.value().parse::<i32>()?, identity.ip_string(), identity.user_agent)
             .fetch_optional(request.rocket().state().unwrap()).await? else {
-            request.cookies().remove_private(Cookie::named("session"));
-            return Ok(Outcome::Failure((Status::Unauthorized, anyhow!("Invalid session cookie"))));
+            request.cookies().remove_private(Cookie::from("session"));
+            return Ok(Outcome::Error((Status::Unauthorized, anyhow!("Invalid session cookie"))));
         };
         Ok(Outcome::Success(query_as!(Self, /* language=postgresql */ "
             SELECT id, username, name, email, account_type, created_at, require_password_change
             FROM users
-            WHERE id = $1;
+            WHERE id = $1
+            LIMIT 1;
             ", user_id.user_id)
             .fetch_one(request.rocket().state().unwrap()).await?))
     }
@@ -111,7 +117,7 @@ impl<'r> FromRequest<'r> for User {
     async fn from_request(request: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         match Self::from_request_inner(request).await {
             Ok(outcome) => outcome,
-            Err(err) => Outcome::Failure((Status::InternalServerError, err)),
+            Err(err) => Outcome::Error((Status::InternalServerError, err)),
         }
     }
 }
@@ -123,7 +129,7 @@ pub struct Identity<'r> {
 
 impl<'r> Identity<'r> {
     pub fn ip_string(&self) -> Option<String> {
-        self.ip.and_then(|ip| Some(ip.to_string()))
+        self.ip.map(|ip| ip.to_string())
     }
 }
 
@@ -137,4 +143,58 @@ impl<'r> FromRequest<'r> for Identity<'r> {
             user_agent: request.headers().get_one("User-Agent"),
         })
     }
+}
+
+#[derive(Deserialize)]
+struct LoginPayload {
+    login: String,
+    password: String,
+}
+
+#[post("/login", data = "<login>")]
+async fn login(login: Json<LoginPayload>, cookie_jar: &CookieJar<'_>, db: &State<PgPool>, identity: Identity<'_>, auth: Option<User>) -> Result<Json<User>, Status> {
+    if auth.is_some() {
+        return Err(Status::BadRequest);
+    }
+    let user = query!(/* language=postgresql */ "SELECT * FROM users WHERE username = $1 OR email = $1;", login.login)
+        .fetch_optional(&**db).await
+        .or(Err(Status::InternalServerError))?
+        .ok_or(Status::Forbidden)?;
+    match ARGON2.verify_password(login.password.as_bytes(), &PasswordHash::new(&*user.password).unwrap()) {
+        Err(argon2::password_hash::Error::Password) => return Err(Status::Forbidden),
+        Err(_) => return Err(Status::InternalServerError),
+        Ok(()) => {},
+    }
+    let token = query!(/* language=postgresql */ "
+        INSERT INTO sessions (user_id, last_seen, last_ip, last_user_agent)
+        VALUES ($1, NOW(), $2, $3)
+        RETURNING id;
+        ", user.id, identity.ip_string(), identity.user_agent)
+        .fetch_one(&**db).await.or(Err(Status::InternalServerError))?;
+    cookie_jar.add_private(Cookie::new("session", token.id.to_string()));
+    Ok(Json(User {
+        id: user.id,
+        username: user.username,
+        name: user.name,
+        email: user.email,
+        account_type: user.account_type.into(),
+        created_at: user.created_at,
+        require_password_change: user.require_password_change,
+    }))
+}
+
+#[get("/login")]
+fn current_user(user: User) -> Json<User> {
+    Json(user)
+}
+
+#[delete("/login")]
+async fn logout(auth: Option<User>, cookie_jar: &CookieJar<'_>, db: &State<PgPool>) -> Status {
+    if auth.is_none() {
+        return Status::BadRequest;
+    }
+    query!(/* language=postgresql */ "DELETE FROM sessions WHERE id = $1;", cookie_jar.get_private("session").unwrap().value().parse::<i32>().unwrap())
+        .execute(&**db).await.unwrap();
+    cookie_jar.remove_private(Cookie::from("session"));
+    Status::NoContent
 }
