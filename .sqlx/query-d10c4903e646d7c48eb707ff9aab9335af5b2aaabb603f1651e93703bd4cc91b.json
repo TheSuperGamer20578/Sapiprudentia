@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            UPDATE sessions\n            SET last_seen = NOW(), last_ip = $2, last_user_agent = $3 WHERE id = $1\n            RETURNING user_id;\n            ",
+  "query": "\n            UPDATE sessions\n            SET last_seen = NOW(), last_ip = $2, last_user_agent = $3\n            WHERE id = $1\n            RETURNING user_id;\n            ",
   "describe": {
     "columns": [
       {
@@ -17,8 +17,8 @@
       ]
     },
     "nullable": [
-      true
+      false
     ]
   },
-  "hash": "e2855b7eaa06203dc2cc9b45aaf716ac89bd6fb61f9d78bd943d3d1080b7042d"
+  "hash": "d10c4903e646d7c48eb707ff9aab9335af5b2aaabb603f1651e93703bd4cc91b"
 }
