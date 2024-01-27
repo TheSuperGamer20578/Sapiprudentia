@@ -4,7 +4,7 @@
 mod auth;
 mod api;
 
-use rocket::Config;
+use jsonwebtoken::{DecodingKey, EncodingKey};
 use rocket_cors::{AllowedOrigins, Cors, CorsOptions};
 use shuttle_secrets::SecretStore;
 use sqlx::PgPool;
@@ -19,11 +19,10 @@ async fn main(
 
     #[allow(unused_mut)]
     let mut rocket = rocket::build()
-        .configure(Config::figment()
-            .merge(("secret_key", secrets.get("SECRET_KEY").unwrap()))
-        )
         .mount("/auth", &**auth::ROUTES)
         .manage(db.clone())
+        .manage(EncodingKey::from_base64_secret(&secrets.get("SECRET_KEY").unwrap()).unwrap())
+        .manage(DecodingKey::from_base64_secret(&secrets.get("SECRET_KEY").unwrap()).unwrap())
         .attach(Cors::from_options(&CorsOptions::default()
             .allowed_origins(AllowedOrigins::some_exact(&secrets.get("CORS_ALLOWED_ORIGINS").unwrap_or_default().split(' ').collect::<Vec<_>>()))
             .allow_credentials(true)
