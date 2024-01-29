@@ -13,6 +13,10 @@ declare global {
         interface PageState {}
 
         interface Platform {}
+
+        interface Session {
+            token: string;
+        }
     }
 }
 

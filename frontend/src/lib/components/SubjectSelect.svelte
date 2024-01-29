@@ -4,7 +4,6 @@
     export let value = "null";
 </script>
 
-{@debug value}
 <select bind:value on:change {required}>
     <option disabled={required} value="null">{required ? "Pick a subject" : "None"}</option>
     {#each subjects as { id, name } (id)}

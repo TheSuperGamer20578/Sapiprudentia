@@ -1,6 +1,16 @@
-<form on:submit|preventDefault>
-    <slot />
-</form>
+<script lang="ts">
+    export let server: boolean = false;
+</script>
+
+{#if server}
+    <form on:submit {...$$restProps}>
+        <slot />
+    </form>
+{:else}
+    <form on:submit|preventDefault {...$$restProps}>
+        <slot />
+    </form>
+{/if}
 
 <style lang="sass">
     @import "$lib/vars"
