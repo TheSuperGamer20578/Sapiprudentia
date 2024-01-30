@@ -119,7 +119,7 @@
     >
         <h1>{editing === null ? "Create" : "Edit"} Todo</h1>
         <label>
-            Title: <input bind:value={title} maxlength="255" required type="text" />
+            Title: <input bind:value={title} maxlength="255" required type="text" autofocus />
         </label>
         {#if showSubject}
             <label>

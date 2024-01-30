@@ -1,8 +1,32 @@
 <script lang="ts">
+    import ConfettiContainer from "$lib/components/ConfettiContainer.svelte";
+    import {Confetti} from "svelte-confetti";
+    import {Howl} from "howler";
+
+    const sound = new Howl({
+        src: ["/complete.wav"],
+    });
+
     export let checked = false;
+    let clicked = false;
 </script>
 
-<input bind:checked on:change type="checkbox" />
+<ConfettiContainer active={clicked && checked}>
+    <input
+        slot="label"
+        type="checkbox"
+        bind:checked
+        on:change={() => {
+            clicked = true;
+            if (checked) {
+                sound.play();
+            }
+        }}
+    />
+    <Confetti x={[-0.5, 0.5]} />
+    <Confetti amount={10} x={[-0.75, -0.3]} y={[0.15, 0.75]} />
+    <Confetti amount={10} x={[0.3, 0.75]} y={[0.15, 0.75]} />
+</ConfettiContainer>
 
 <style lang="sass">
     input

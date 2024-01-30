@@ -32,8 +32,10 @@
                 }))}
         />
     </div>
-    <div class="content">
-        <slot />
+    <div class="scroll">
+        <div class="content">
+            <slot />
+        </div>
     </div>
 </div>
 
@@ -47,12 +49,15 @@
         display: flex
         flex-direction: row
 
+    .scroll
+        width: 100%
+        height: 100%
+        overflow-y: auto
+
     .content
         flex: 1
-        overflow: auto
         max-width: 100ch
-        margin: 2em auto 0 auto
-        padding-inline: 1em
+        margin: 2em auto 25vh auto
 
     .sidebar
         width: 25ch
