@@ -1,4 +1,4 @@
-use async_graphql::{Object, SimpleObject};
+use async_graphql::SimpleObject;
 use chrono::NaiveDateTime;
 
 #[derive(SimpleObject)]

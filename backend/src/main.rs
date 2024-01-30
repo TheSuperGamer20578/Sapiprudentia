@@ -10,6 +10,7 @@ use shuttle_secrets::SecretStore;
 use sqlx::PgPool;
 use crate::api::graphql::create_schema;
 
+#[allow(clippy::unwrap_used)]
 #[shuttle_runtime::main]
 async fn main(
     #[shuttle_shared_db::Postgres] db: PgPool,

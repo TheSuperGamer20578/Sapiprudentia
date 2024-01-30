@@ -1,4 +1,5 @@
 #![allow(clippy::unused_async)]
+#![allow(clippy::no_effect_underscore_binding)]
 
 mod query;
 mod mutation;

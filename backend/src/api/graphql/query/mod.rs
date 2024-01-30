@@ -12,6 +12,7 @@ use crate::api::graphql::query::subject::Subject;
 use crate::api::graphql::query::todo::Todo;
 use crate::auth::User;
 
+#[allow(clippy::module_name_repetitions)]
 pub struct QueryRoot;
 
 #[Object]

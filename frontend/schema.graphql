@@ -1,132 +1,183 @@
 schema {
-  query: QueryRoot
-  mutation: MutationRoot
+    query: QueryRoot
+    mutation: MutationRoot
 }
 
 type Document {
-  """The content of the document as output and understood by TipTap."""
-  content: JSON
+    """
+    The content of the document as output and understood by TipTap.
+    """
+    content: JSON
 
-  """The date and time the document was created."""
-  createdAt: NaiveDateTime!
+    """
+    The date and time the document was created.
+    """
+    createdAt: NaiveDateTime!
 
-  """The ID of the document."""
-  id: Int!
+    """
+    The ID of the document.
+    """
+    id: Int!
 
-  """The date and time the document was last modified."""
-  lastModified: NaiveDateTime!
+    """
+    The date and time the document was last modified.
+    """
+    lastModified: NaiveDateTime!
 
-  """The title of the document."""
-  title: String!
+    """
+    The title of the document.
+    """
+    title: String!
 }
 
 type DocumentMutation {
-  """Updates the document's content. Returns the updated document."""
-  content(
-    """The new content of the document."""
-    content: JSON
-  ): Document!
+    """
+    Updates the document's content. Returns the updated document.
+    """
+    content(
+        """
+        The new content of the document.
+        """
+        content: JSON
+    ): Document!
 
-  """Delete the document. Always returns true or an error."""
-  delete: Boolean!
+    """
+    Delete the document. Always returns true or an error.
+    """
+    delete: Boolean!
 
-  """Updates the document's title. Returns the updated document."""
-  title(
-    """The new title of the document."""
-    title: String!
-  ): Document!
+    """
+    Updates the document's title. Returns the updated document.
+    """
+    title(
+        """
+        The new title of the document.
+        """
+        title: String!
+    ): Document!
 }
 
-"""A scalar that can represent any JSON value."""
+"""
+A scalar that can represent any JSON value.
+"""
 scalar JSON
 
 type MutationRoot {
-  """
-  Creates a new document. Returns the newly created document.
-  Requires authentication.
-  Deprecated.
-  """
-  createDocument(
-    """The content of the document. Default: null"""
-    content: JSON = null
+    """
+    Creates a new document. Returns the newly created document.
+    Requires authentication.
+    Deprecated.
+    """
+    createDocument(
+        """
+        The content of the document. Default: null
+        """
+        content: JSON = null
+
+        """
+        The title of the document. Default: ""
+        """
+        title: String! = ""
+    ): Document!
+        @deprecated(
+            reason: "For development purposes only, will be removed in the future in favour of automatic creation."
+        )
 
     """
-    The title of the document. Default: ""
+    Creates a new subject. Returns the newly created subject.
+    Requires authentication.
     """
-    title: String! = ""
-  ): Document! @deprecated(reason: "For development purposes only, will be removed in the future in favour of automatic creation.")
+    createSubject(
+        """
+        Whether the subject is active. Default: true
+        """
+        active: Boolean! = true
 
-  """
-  Creates a new subject. Returns the newly created subject.
-  Requires authentication.
-  """
-  createSubject(
-    """Whether the subject is active. Default: true"""
-    active: Boolean! = true
+        """
+        The class of the subject.
+        """
+        class: String!
 
-    """The class of the subject."""
-    class: String!
+        """
+        The subject's Google Classroom ID. Default: null
+        """
+        googleClassroomId: String = null
 
-    """The subject's Google Classroom ID. Default: null"""
-    googleClassroomId: String = null
+        """
+        The name of the subject.
+        """
+        name: String!
+    ): Subject!
 
-    """The name of the subject."""
-    name: String!
-  ): Subject!
+    """
+    Creates a new to-do. Returns the newly created to-do.
+    Requires authentication.
+    """
+    createTodo(
+        """
+        The archived status of the to-do. Default: false
+        """
+        archived: Boolean! = false
 
-  """
-  Creates a new to-do. Returns the newly created to-do.
-  Requires authentication.
-  """
-  createTodo(
-    """The archived status of the to-do. Default: false"""
-    archived: Boolean! = false
+        """
+        The completed status of the to-do. Default: false
+        """
+        completed: Boolean! = false
 
-    """The completed status of the to-do. Default: false"""
-    completed: Boolean! = false
+        """
+        The due date of the to-do. Default: null
+        """
+        due: NaiveDate = null
 
-    """The due date of the to-do. Default: null"""
-    due: NaiveDate = null
+        """
+        The to-do's subject's ID. Default: null
+        """
+        subject: Int = null
 
-    """The to-do's subject's ID. Default: null"""
-    subject: Int = null
+        """
+        The title of the to-do.
+        """
+        title: String!
+    ): Todo!
 
-    """The title of the to-do."""
-    title: String!
-  ): Todo!
+    """
+    Get the current user for modification.
+    Requires authentication.
+    """
+    currentUser: UserMutation!
 
-  """
-  Get the current user for modification.
-  Requires authentication.
-  """
-  currentUser: UserMutation!
+    """
+    Get a document for modification.
+    Requires authentication.
+    """
+    document(
+        """
+        The ID of the document to modify.
+        """
+        id: Int!
+    ): DocumentMutation!
 
-  """
-  Get a document for modification.
-  Requires authentication.
-  """
-  document(
-    """The ID of the document to modify."""
-    id: Int!
-  ): DocumentMutation!
+    """
+    Get a subject for modification.
+    Requires authentication.
+    """
+    subject(
+        """
+        The ID of the subject to modify.
+        """
+        id: Int!
+    ): SubjectMutation!
 
-  """
-  Get a subject for modification.
-  Requires authentication.
-  """
-  subject(
-    """The ID of the subject to modify."""
-    id: Int!
-  ): SubjectMutation!
-
-  """
-  Get a to-do for modification.
-  Requires authentication.
-  """
-  todo(
-    """The ID of the to-do to modify."""
-    id: Int!
-  ): TodoMutation!
+    """
+    Get a to-do for modification.
+    Requires authentication.
+    """
+    todo(
+        """
+        The ID of the to-do to modify.
+        """
+        id: Int!
+    ): TodoMutation!
 }
 
 """
@@ -150,277 +201,401 @@ ISO 8601 combined date and time without timezone.
 scalar NaiveDateTime
 
 type QueryRoot {
-  """Get authenticated user data or null if not authenticated."""
-  currentUser: User
+    """
+    Get authenticated user data or null if not authenticated.
+    """
+    currentUser: User
 
-  """
-  Get a single document by ID.
-  Requires authentication.
-  """
-  document(
-    """The ID of the document to get."""
-    id: Int!
-  ): Document!
+    """
+    Get a single document by ID.
+    Requires authentication.
+    """
+    document(
+        """
+        The ID of the document to get.
+        """
+        id: Int!
+    ): Document!
 
-  """
-  Get list of all documents owned by the authenticated user.
-  Requires authentication.
-  """
-  documents: [Document!]!
+    """
+    Get list of all documents owned by the authenticated user.
+    Requires authentication.
+    """
+    documents: [Document!]!
 
-  """
-  Get a single subject by ID.
-  Requires authentication.
-  """
-  subject(
-    """The ID of the subject to get."""
-    id: Int!
-  ): Subject!
+    """
+    Get a single subject by ID.
+    Requires authentication.
+    """
+    subject(
+        """
+        The ID of the subject to get.
+        """
+        id: Int!
+    ): Subject!
 
-  """
-  Get list of all subjects owned by the authenticated user.
-  Requires authentication.
-  """
-  subjects: [Subject!]!
+    """
+    Get list of all subjects owned by the authenticated user.
+    Requires authentication.
+    """
+    subjects: [Subject!]!
 
-  """
-  Get a single to-do by ID.
-  Requires authentication.
-  """
-  todo(
-    """The ID of the to-do to get."""
-    id: Int!
-  ): Todo!
+    """
+    Get a single to-do by ID.
+    Requires authentication.
+    """
+    todo(
+        """
+        The ID of the to-do to get.
+        """
+        id: Int!
+    ): Todo!
 
-  """
-  Get list of all todos owned by the authenticated user.
-  Requires authentication.
-  """
-  todos: [Todo!]!
+    """
+    Get list of all todos owned by the authenticated user.
+    Requires authentication.
+    """
+    todos: [Todo!]!
 }
 
 type Session {
-  """The date and time the session was created."""
-  createdAt: NaiveDateTime!
+    """
+    The date and time the session was created.
+    """
+    createdAt: NaiveDateTime!
 
-  """The session ID."""
-  id: Int!
+    """
+    The session ID.
+    """
+    id: Int!
 
-  """The IP address of the last request made with this session."""
-  ip: String
+    """
+    The IP address of the last request made with this session.
+    """
+    ip: String
 
-  """The date and time of the last request made with this session."""
-  lastSeen: NaiveDateTime!
+    """
+    The date and time of the last request made with this session.
+    """
+    lastSeen: NaiveDateTime!
 
-  """The user agent of the last request made with this session."""
-  userAgent: String
+    """
+    The user agent of the last request made with this session.
+    """
+    userAgent: String
 }
 
 type SessionMutation {
-  """Revoke the session. Always returns true or an error."""
-  delete: Boolean!
+    """
+    Revoke the session. Always returns true or an error.
+    """
+    delete: Boolean!
 }
 
 type Subject {
-  """Whether the subject should appear in navigation."""
-  active: Boolean!
+    """
+    Whether the subject should appear in navigation.
+    """
+    active: Boolean!
 
-  """The class of the subject."""
-  class: String!
+    """
+    The class of the subject.
+    """
+    class: String!
 
-  """The Google Classroom ID of the subject."""
-  googleClassroomId: String
+    """
+    The Google Classroom ID of the subject.
+    """
+    googleClassroomId: String
 
-  """The ID of the subject."""
-  id: Int!
+    """
+    The ID of the subject.
+    """
+    id: Int!
 
-  """The name of the subject."""
-  name: String!
+    """
+    The name of the subject.
+    """
+    name: String!
 }
 
 type SubjectMutation {
-  """
-  Updates the active status of the subject. Returns the updated subject.
-  Active subjects are shown in the navigation.
-  """
-  active(
-    """The new active status of the subject."""
-    active: Boolean!
-  ): Subject!
+    """
+    Updates the active status of the subject. Returns the updated subject.
+    Active subjects are shown in the navigation.
+    """
+    active(
+        """
+        The new active status of the subject.
+        """
+        active: Boolean!
+    ): Subject!
 
-  """Updates the subject's class. Returns the updated subject."""
-  class(
-    """The new class of the subject."""
-    class: String
-  ): Subject!
+    """
+    Updates the subject's class. Returns the updated subject.
+    """
+    class(
+        """
+        The new class of the subject.
+        """
+        class: String
+    ): Subject!
 
-  """Delete the subject. Always returns true or an error."""
-  delete: Boolean!
+    """
+    Delete the subject. Always returns true or an error.
+    """
+    delete: Boolean!
 
-  """
-  Updates the subject's Google Classroom ID. Returns the updated subject.
-  """
-  googleClassroomId(
-    """The new Google Classroom ID of the subject."""
-    googleClassroomId: String
-  ): Subject!
+    """
+    Updates the subject's Google Classroom ID. Returns the updated subject.
+    """
+    googleClassroomId(
+        """
+        The new Google Classroom ID of the subject.
+        """
+        googleClassroomId: String
+    ): Subject!
 
-  """Updates the subject's name. Returns the updated subject."""
-  name(
-    """The new name of the subject."""
-    name: String!
-  ): Subject!
+    """
+    Updates the subject's name. Returns the updated subject.
+    """
+    name(
+        """
+        The new name of the subject.
+        """
+        name: String!
+    ): Subject!
 }
 
 type Todo {
-  """
-  Whether the to-do is archived.
-  Archived todos are hidden from the default view.
-  """
-  archived: Boolean!
+    """
+    Whether the to-do is archived.
+    Archived todos are hidden from the default view.
+    """
+    archived: Boolean!
 
-  """The children of the to-do."""
-  children: [Todo!]!
+    """
+    The children of the to-do.
+    """
+    children: [Todo!]!
 
-  """Whether the to-do is completed."""
-  completed: Boolean!
+    """
+    Whether the to-do is completed.
+    """
+    completed: Boolean!
 
-  """The due date of the to-do."""
-  due: NaiveDate
+    """
+    The due date of the to-do.
+    """
+    due: NaiveDate
 
-  """The ID of the to-do."""
-  id: Int!
+    """
+    The ID of the to-do.
+    """
+    id: Int!
 
-  """The parent of the to-do."""
-  parent: Todo
+    """
+    The parent of the to-do.
+    """
+    parent: Todo
 
-  """The subject of the to-do."""
-  subject: Subject
+    """
+    The subject of the to-do.
+    """
+    subject: Subject
 
-  """The title of the to-do."""
-  title: String!
+    """
+    The title of the to-do.
+    """
+    title: String!
 }
 
 type TodoMutation {
-  """
-  Updates the to-do's archived status. Returns the updated to-do.
-  Archived to-dos are hidden from the default view.
-  Does nothing if the to-do is a child.
-  """
-  archived(
-    """The new archived status."""
-    archived: Boolean!
-  ): Todo!
+    """
+    Updates the to-do's archived status. Returns the updated to-do.
+    Archived to-dos are hidden from the default view.
+    Does nothing if the to-do is a child.
+    """
+    archived(
+        """
+        The new archived status.
+        """
+        archived: Boolean!
+    ): Todo!
 
-  """Updates the to-do's completed status. Returns the updated to-do."""
-  completed(
-    """The new completed status."""
-    completed: Boolean!
-  ): Todo!
+    """
+    Updates the to-do's completed status. Returns the updated to-do.
+    """
+    completed(
+        """
+        The new completed status.
+        """
+        completed: Boolean!
+    ): Todo!
 
-  """
-  Creates a child to-do. Returns the newly created to-do.
-  Requires authentication.
-  """
-  createChild(
-    """The completed status of the to-do. Default: false"""
-    completed: Boolean! = false
+    """
+    Creates a child to-do. Returns the newly created to-do.
+    Requires authentication.
+    """
+    createChild(
+        """
+        The completed status of the to-do. Default: false
+        """
+        completed: Boolean! = false
 
-    """The due date of the to-do. Default: null"""
-    due: NaiveDate = null
+        """
+        The due date of the to-do. Default: null
+        """
+        due: NaiveDate = null
 
-    """The title of the to-do."""
-    title: String!
-  ): Todo!
+        """
+        The title of the to-do.
+        """
+        title: String!
+    ): Todo!
 
-  """
-  Delete the to-do. Returns the deleted to-do.
-  Also deletes children.
-  """
-  delete: Todo!
+    """
+    Delete the to-do. Returns the deleted to-do.
+    Also deletes children.
+    """
+    delete: Todo!
 
-  """Updates the to-do's due date. Returns the updated to-do."""
-  due(
-    """The new due date."""
-    due: NaiveDate
-  ): Todo!
+    """
+    Updates the to-do's due date. Returns the updated to-do.
+    """
+    due(
+        """
+        The new due date.
+        """
+        due: NaiveDate
+    ): Todo!
 
-  """Changes the to-do's parent. Returns the updated to-do."""
-  parent(
-    """The new parent's ID."""
-    id: Int
-  ): Todo!
+    """
+    Changes the to-do's parent. Returns the updated to-do.
+    """
+    parent(
+        """
+        The new parent's ID.
+        """
+        id: Int
+    ): Todo!
 
-  """Updates the to-do's subject. Returns the updated to-do."""
-  subject(
-    """The new subject's ID."""
-    id: Int
-  ): Todo!
+    """
+    Updates the to-do's subject. Returns the updated to-do.
+    """
+    subject(
+        """
+        The new subject's ID.
+        """
+        id: Int
+    ): Todo!
 
-  """Updates the to-do's title. Returns the updated to-do."""
-  title(
-    """The new title."""
-    title: String!
-  ): Todo!
+    """
+    Updates the to-do's title. Returns the updated to-do.
+    """
+    title(
+        """
+        The new title.
+        """
+        title: String!
+    ): Todo!
 }
 
 type User {
-  """The date and time the user was created."""
-  createdAt: NaiveDateTime!
+    """
+    The date and time the user was created.
+    """
+    createdAt: NaiveDateTime!
 
-  """The email address of the user."""
-  email: String!
+    """
+    The email address of the user.
+    """
+    email: String!
 
-  """The user ID."""
-  id: Int!
+    """
+    The user ID.
+    """
+    id: Int!
 
-  """The name used in the UI."""
-  name: String!
+    """
+    The name used in the UI.
+    """
+    name: String!
 
-  """Weather the user is required to change their password on next login."""
-  requirePasswordChange: Boolean!
+    """
+    Weather the user is required to change their password on next login.
+    """
+    requirePasswordChange: Boolean!
 
-  """Get a single session by ID."""
-  session(id: Int!): Session!
+    """
+    Get a single session by ID.
+    """
+    session(id: Int!): Session!
 
-  """List of all active sessions for the user."""
-  sessions: [Session!]!
+    """
+    List of all active sessions for the user.
+    """
+    sessions: [Session!]!
 
-  """The unique username used for login."""
-  username: String!
+    """
+    The unique username used for login.
+    """
+    username: String!
 }
 
 type UserMutation {
-  """Delete the user. Always returns true or an error."""
-  delete: Boolean!
+    """
+    Delete the user. Always returns true or an error.
+    """
+    delete: Boolean!
 
-  """Updates the user's email. Returns the updated user."""
-  email(
-    """The new email of the user."""
-    email: String!
-  ): User!
+    """
+    Updates the user's email. Returns the updated user.
+    """
+    email(
+        """
+        The new email of the user.
+        """
+        email: String!
+    ): User!
 
-  """Updates the user's name. Returns the updated user."""
-  name(
-    """The new name of the user."""
-    name: String!
-  ): User!
+    """
+    Updates the user's name. Returns the updated user.
+    """
+    name(
+        """
+        The new name of the user.
+        """
+        name: String!
+    ): User!
 
-  """Updates the user's password. Returns the updated user."""
-  password(
-    """The new password of the user."""
-    password: String!
-  ): User!
+    """
+    Updates the user's password. Returns the updated user.
+    """
+    password(
+        """
+        The new password of the user.
+        """
+        password: String!
+    ): User!
 
-  """Get a session for modification."""
-  session(
-    """The ID of the session to modify."""
-    id: Int!
-  ): SessionMutation!
+    """
+    Get a session for modification.
+    """
+    session(
+        """
+        The ID of the session to modify.
+        """
+        id: Int!
+    ): SessionMutation!
 
-  """Updates the user's username. Returns the updated user."""
-  username(
-    """The new username of the user."""
-    username: String!
-  ): User!
+    """
+    Updates the user's username. Returns the updated user.
+    """
+    username(
+        """
+        The new username of the user.
+        """
+        username: String!
+    ): User!
 }

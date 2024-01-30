@@ -1,9 +1,8 @@
 node_modules/
-build/
 .svelte-kit/
 package/
 .sqlx/
-.idea/
 target/
 pnpm-lock.yaml
 package-lock.json
+$houdini/

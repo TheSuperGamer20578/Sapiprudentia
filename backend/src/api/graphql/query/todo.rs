@@ -1,4 +1,4 @@
-use async_graphql::{ComplexObject, Context, Object, Result, SimpleObject};
+use async_graphql::{ComplexObject, Context, Result, SimpleObject};
 use chrono::NaiveDate;
 use rocket::http::Status;
 use sqlx::{PgPool, query_as};

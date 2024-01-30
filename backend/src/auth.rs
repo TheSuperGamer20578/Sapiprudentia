@@ -1,8 +1,10 @@
+#![allow(clippy::no_effect_underscore_binding)]
+
 use std::net::IpAddr;
 use std::ops::Add;
 use anyhow::{anyhow};
 use argon2::{Argon2, PasswordHash, PasswordVerifier};
-use chrono::{DateTime, Duration, NaiveDateTime, Utc};
+use chrono::{Duration, NaiveDateTime, Utc};
 use jsonwebtoken::{Algorithm, decode, DecodingKey, encode, EncodingKey, Header, Validation};
 use lazy_static::lazy_static;
 use rocket::{async_trait, delete, get, post, Request, Route, routes, State};
@@ -75,7 +77,7 @@ impl<'r> FromRequest<'r> for Token {
         let Some(header) = request.headers().get_one("Authorization") else {
             return Outcome::Error((Status::Unauthorized, anyhow!("Missing Authorization header")));
         };
-        match header.split_once(" ") {
+        match header.split_once(' ') {
             Some(("Bearer", token)) => {
                 let Ok(data) = decode::<Self>(token.trim(), request.guard::<&State<DecodingKey>>().await.unwrap(), &Validation::new(Algorithm::HS512)) else {
                     return Outcome::Error((Status::Unauthorized, anyhow!("Invalid token")));
@@ -195,7 +197,7 @@ async fn login(login: Json<LoginPayload>, db: &State<PgPool>, secret_key: &State
         .fetch_optional(&**db).await
         .or(Err(Status::InternalServerError))?
         .ok_or(Status::Forbidden)?;
-    match ARGON2.verify_password(login.password.as_bytes(), &PasswordHash::new(&*user.password).unwrap()) {
+    match ARGON2.verify_password(login.password.as_bytes(), &PasswordHash::new(&user.password).unwrap()) {
         Err(argon2::password_hash::Error::Password) => return Err(Status::Forbidden),
         Err(_) => return Err(Status::InternalServerError),
         Ok(()) => {},

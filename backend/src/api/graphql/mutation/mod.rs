@@ -1,3 +1,5 @@
+#![allow(clippy::module_name_repetitions)]
+
 mod document;
 mod session;
 mod subject;
@@ -7,7 +9,6 @@ mod user;
 use async_graphql::{Context, Object, Result};
 use chrono::NaiveDate;
 use rocket::http::Status;
-use rocket::outcome::IntoOutcome;
 use sqlx::{PgPool, query, query_as};
 use crate::api::graphql::mutation::document::DocumentMutation;
 use crate::api::graphql::mutation::subject::SubjectMutation;

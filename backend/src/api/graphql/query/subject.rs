@@ -1,4 +1,4 @@
-use async_graphql::{Object, SimpleObject};
+use async_graphql::SimpleObject;
 
 #[derive(SimpleObject)]
 pub struct Subject {

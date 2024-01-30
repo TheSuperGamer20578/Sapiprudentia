@@ -1,9 +1,9 @@
 projects:
-  default:
-    schema:
-      - "http://localhost:8000/graphql"
-      - ./$houdini/graphql/schema.graphql
-    documents:
-      - '**/*.gql'
-      - '**/*.svelte'
-      - ./$houdini/graphql/documents.gql
+    default:
+        schema:
+            - "http://localhost:8000/graphql"
+            - ./$houdini/graphql/schema.graphql
+        documents:
+            - "**/*.gql"
+            - "**/*.svelte"
+            - ./$houdini/graphql/documents.gql
