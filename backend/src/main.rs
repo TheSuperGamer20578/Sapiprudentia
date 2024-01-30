@@ -24,7 +24,7 @@ async fn main(
         .manage(EncodingKey::from_base64_secret(&secrets.get("SECRET_KEY").unwrap()).unwrap())
         .manage(DecodingKey::from_base64_secret(&secrets.get("SECRET_KEY").unwrap()).unwrap())
         .attach(Cors::from_options(&CorsOptions::default()
-            .allowed_origins(AllowedOrigins::some_exact(&secrets.get("CORS_ALLOWED_ORIGINS").unwrap_or_default().split(' ').collect::<Vec<_>>()))
+            .allowed_origins(AllowedOrigins::some_regex(&secrets.get("CORS_ALLOWED_ORIGINS").unwrap_or_default().split(' ').collect::<Vec<_>>()))
             .allow_credentials(true)
         ).unwrap());
     #[cfg(feature = "api_graphql")] {
