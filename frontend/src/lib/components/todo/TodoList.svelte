@@ -38,7 +38,6 @@
         {
             title: "Archived",
             value: true,
-            count: archived.length.toString(),
         },
     ]}
 >
