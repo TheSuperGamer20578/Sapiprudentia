@@ -2,10 +2,12 @@
     import ConfettiContainer from "$lib/components/ConfettiContainer.svelte";
     import {Confetti} from "svelte-confetti";
     import {Howl} from "howler";
+    import {createEventDispatcher} from "svelte";
 
     const sound = new Howl({
         src: ["/complete.wav"],
     });
+    const dispatch = createEventDispatcher();
 
     export let checked = false;
     let clicked = false;
@@ -16,11 +18,12 @@
         slot="label"
         type="checkbox"
         bind:checked
-        on:change={() => {
+        on:change={(e) => {
             clicked = true;
             if (checked) {
                 sound.play();
             }
+            dispatch("change", e);
         }}
     />
     <Confetti x={[-0.5, 0.5]} />
