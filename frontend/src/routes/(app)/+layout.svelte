@@ -50,12 +50,12 @@
         flex-direction: row
 
     .scroll
+        flex: 1
         width: 100%
         height: 100%
         overflow-y: auto
 
     .content
-        flex: 1
         max-width: 100ch
         margin: 2em auto 25vh auto
 

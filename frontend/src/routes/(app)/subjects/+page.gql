@@ -1,0 +1,8 @@
+query Subjects {
+    subjects @list(name: "subjects") {
+        id
+        name
+        class
+        active
+    }
+}

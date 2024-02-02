@@ -1,6 +1,7 @@
 <script lang="ts">
     import TodoList from "$lib/components/todo/TodoList.svelte";
     import type {PageData} from "./$houdini";
+    import Spinner from "$lib/components/Spinner.svelte";
 
     export let data: PageData;
     $: ({Todo} = data);
@@ -19,7 +20,7 @@
 
 <h1>Todo</h1>
 {#if $Todo.fetching}
-    Loading...
+    <Spinner />
 {:else}
     <TodoList {todos} {subjects} />
 {/if}
