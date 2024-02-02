@@ -178,7 +178,7 @@
                                 </Chip>
                             </span>
                         {/if}
-                        {#if todo.subject}
+                        {#if showSubject && todo.subject}
                             <Chip>
                                 <IconBook />
                                 {todo.subject?.name}

@@ -19,7 +19,7 @@
         title = "";
         subject = JSON.stringify(withSubject);
         due = null;
-        showSubject = withSubject !== null;
+        showSubject = withSubject === null;
         parent = null;
         editing = null;
         modal.open();
