@@ -1,20 +1,20 @@
 #![allow(clippy::module_name_repetitions)]
 
-mod document;
 mod session;
 mod subject;
 mod todo;
 mod user;
+mod note;
 
 use async_graphql::{Context, Object, Result};
 use chrono::NaiveDate;
 use rocket::http::Status;
 use sqlx::{PgPool, query, query_as};
-use crate::api::graphql::mutation::document::DocumentMutation;
+use crate::api::graphql::mutation::note::NoteMutation;
 use crate::api::graphql::mutation::subject::SubjectMutation;
 use crate::api::graphql::mutation::todo::TodoMutation;
 use crate::api::graphql::mutation::user::UserMutation;
-use crate::api::graphql::query::document::Document;
+use crate::api::graphql::query::note::Note;
 use crate::api::graphql::query::subject::Subject;
 use crate::api::graphql::query::todo::Todo;
 use crate::auth::User;
@@ -23,33 +23,33 @@ pub struct MutationRoot;
 
 #[Object]
 impl MutationRoot {
-    /// Get a document for modification.
+    /// Get a note for modification.
     /// Requires authentication.
-    async fn document(&self, ctx: &Context<'_>, #[graphql(desc = "The ID of the document to modify.")] id: i32) -> Result<DocumentMutation> {
+    async fn note(&self, ctx: &Context<'_>, #[graphql(desc = "The ID of the note to modify.")] id: i32) -> Result<NoteMutation> {
         let Some(user) = ctx.data::<Option<User>>()? else {
             return Err(Status::Unauthorized.into());
         };
-        query(/* language=postgresql */ "SELECT 1 FROM documents WHERE owner = $1 AND id = $2 LIMIT 1;")
+        query(/* language=postgresql */ "SELECT 1 FROM notes WHERE owner = $1 AND id = $2 LIMIT 1;")
             .bind(user.id)
             .bind(id)
             .fetch_optional(ctx.data::<PgPool>()?).await?.ok_or(Status::NotFound)?;
-        Ok(DocumentMutation(id))
+        Ok(NoteMutation(id))
     }
 
-    /// Creates a new document. Returns the newly created document.
+    /// Creates a new note. Returns the newly created note.
     /// Requires authentication.
-    /// Deprecated.
-    #[graphql(deprecation = "For development purposes only, will be removed in the future in favour of automatic creation.")]
-    async fn create_document(
+    async fn create_note(
         &self,
         ctx: &Context<'_>,
-        #[graphql(desc = r#"The title of the document. Default: """#, default = "", validator(max_length = 255))] title: String,
-        #[graphql(desc = "The content of the document. Default: null", default)] content: Option<serde_json::Value>,
-    ) -> Result<Document> {
+        #[graphql(desc = r#"The title of the note. Default: """#, default = "", validator(max_length = 255))] title: String,
+        #[graphql(desc = r#"The content of the note. Default: {"type": "doc", "content": []}"#, default)] content: Option<serde_json::Value>,
+        #[graphql(desc = "The subject of the note. Default: null", default)] subject: Option<i32>,
+        // TODO: Date
+    ) -> Result<Note> {
         let Some(user) = ctx.data::<Option<User>>()? else {
             return Err(Status::Unauthorized.into());
         };
-        query_as!(Document, /* language=postgresql */ "INSERT INTO documents (owner, title, content) VALUES ($1, $2, $3) RETURNING *;", user.id, title, content)
+        query_as!(Note, /* language=postgresql */ "INSERT INTO notes (owner, title, content, subject) VALUES ($1, $2, $3, $4) RETURNING *;", user.id, title, content, subject)
             .fetch_one(ctx.data::<PgPool>()?).await.map_err(Into::into)
     }
 

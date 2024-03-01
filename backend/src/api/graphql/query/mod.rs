@@ -1,13 +1,13 @@
-pub(super) mod document;
 pub(super) mod user;
 pub(super) mod session;
 pub(super) mod subject;
 pub(super) mod todo;
+pub(super) mod note;
 
 use async_graphql::{Context, Result, Object};
 use rocket::http::Status;
 use sqlx::{PgPool, query_as};
-use crate::api::graphql::query::document::Document;
+use crate::api::graphql::query::note::Note;
 use crate::api::graphql::query::subject::Subject;
 use crate::api::graphql::query::todo::Todo;
 use crate::auth::User;
@@ -22,25 +22,25 @@ impl QueryRoot {
         Ok(ctx.data::<Option<User>>()?.clone())
     }
 
-    /// Get list of all documents owned by the authenticated user.
+    /// Get list of all notes owned by the authenticated user.
     /// Requires authentication.
-    async fn documents(&self, ctx: &Context<'_>) -> Result<Vec<Document>> {
+    async fn notes(&self, ctx: &Context<'_>) -> Result<Vec<Note>> {
         let Some(user) = ctx.data::<Option<User>>()? else {
             return Err(Status::Unauthorized.into());
         };
         let pool = ctx.data::<PgPool>()?;
-        Ok(query_as!(Document, /* language=postgresql */ "SELECT * FROM documents WHERE owner = $1;", user.id)
+        Ok(query_as!(Note, /* language=postgresql */ "SELECT * FROM notes WHERE owner = $1;", user.id)
             .fetch_all(pool).await?)
     }
 
-    /// Get a single document by ID.
+    /// Get a single note by ID.
     /// Requires authentication.
-    async fn document(&self, ctx: &Context<'_>, #[graphql(desc = "The ID of the document to get.")] id: i32) -> Result<Document> {
+    async fn note(&self, ctx: &Context<'_>, #[graphql(desc = "The ID of the note to get.")] id: i32) -> Result<Note> {
         let Some(user) = ctx.data::<Option<User>>()? else {
             return Err(Status::Unauthorized.into());
         };
         let pool = ctx.data::<PgPool>()?;
-        query_as!(Document, /* language=postgresql */ "SELECT * FROM documents WHERE owner = $1 AND id = $2 LIMIT 1;", user.id, id)
+        query_as!(Note, /* language=postgresql */ "SELECT * FROM notes WHERE owner = $1 AND id = $2 LIMIT 1;", user.id, id)
             .fetch_optional(pool).await?.ok_or(Status::NotFound.into())
     }
 

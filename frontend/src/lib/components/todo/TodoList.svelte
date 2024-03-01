@@ -58,7 +58,7 @@
             rootTodos={tab ? archived : todo}
             showSubject={subject === null}
             addChild={(parent) => addModal.createSubtask(parent)}
-            edit={(todo) => addModal.edit(todo)}
+            edit={(todo) => addModal.edit({...todo, showSubject: subject === null})}
         />
     {/if}
 </Tabs>

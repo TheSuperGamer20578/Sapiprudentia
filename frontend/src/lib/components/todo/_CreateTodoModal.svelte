@@ -41,11 +41,12 @@
         subject: number | null;
         due: DateTime | null;
         parent: any | null;
+        showSubject: boolean;
     }) {
         title = todo.title;
         subject = JSON.stringify(todo.subject);
         due = todo.due?.toISODate() ?? null;
-        showSubject = parent === null;
+        showSubject = todo.showSubject && todo.parent === null;
         editing = todo.id;
         modal.open();
     }

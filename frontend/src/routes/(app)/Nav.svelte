@@ -5,6 +5,7 @@
 <nav>
     <ul>
         <li><a href="/todo">Todo</a></li>
+        <li><a href="/notes">Notes</a></li>
     </ul>
     <hr />
     <ul>

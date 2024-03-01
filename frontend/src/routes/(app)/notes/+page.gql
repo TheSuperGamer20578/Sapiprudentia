@@ -1,0 +1,10 @@
+query Notes {
+    notes @list(name: "notes") {
+        id,
+        title,
+        date,
+        subject {
+            name
+        }
+    }
+}

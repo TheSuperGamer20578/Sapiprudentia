@@ -3,58 +3,26 @@ schema {
   mutation: MutationRoot
 }
 
-type Document {
-  """The content of the document as output and understood by TipTap."""
-  content: JSON
-
-  """The date and time the document was created."""
-  createdAt: NaiveDateTime!
-
-  """The ID of the document."""
-  id: Int!
-
-  """The date and time the document was last modified."""
-  lastModified: NaiveDateTime!
-
-  """The title of the document."""
-  title: String!
-}
-
-type DocumentMutation {
-  """Updates the document's content. Returns the updated document."""
-  content(
-    """The new content of the document."""
-    content: JSON
-  ): Document!
-
-  """Delete the document. Always returns true or an error."""
-  delete: Boolean!
-
-  """Updates the document's title. Returns the updated document."""
-  title(
-    """The new title of the document."""
-    title: String!
-  ): Document!
-}
-
 """A scalar that can represent any JSON value."""
 scalar JSON
 
 type MutationRoot {
   """
-  Creates a new document. Returns the newly created document.
+  Creates a new note. Returns the newly created note.
   Requires authentication.
-  Deprecated.
   """
-  createDocument(
-    """The content of the document. Default: null"""
+  createNote(
+    """The content of the note. Default: {"type": "doc", "content": []}"""
     content: JSON = null
 
+    """The subject of the note. Default: null"""
+    subject: Int = null
+
     """
-    The title of the document. Default: ""
+    The title of the note. Default: ""
     """
     title: String! = ""
-  ): Document! @deprecated(reason: "For development purposes only, will be removed in the future in favour of automatic creation.")
+  ): Note!
 
   """
   Creates a new subject. Returns the newly created subject.
@@ -102,13 +70,13 @@ type MutationRoot {
   currentUser: UserMutation!
 
   """
-  Get a document for modification.
+  Get a note for modification.
   Requires authentication.
   """
-  document(
-    """The ID of the document to modify."""
+  note(
+    """The ID of the note to modify."""
     id: Int!
-  ): DocumentMutation!
+  ): NoteMutation!
 
   """
   Get a subject for modification.
@@ -149,24 +117,70 @@ ISO 8601 combined date and time without timezone.
 """
 scalar NaiveDateTime
 
+type Note {
+  """The document’s content as understood by TipTap"""
+  content: JSON!
+
+  """The date of the note’s class"""
+  date: NaiveDate!
+
+  """The note’s ID"""
+  id: Int!
+
+  """The subject of the note."""
+  subject: Subject
+
+  """The note’s title"""
+  title: String!
+}
+
+type NoteMutation {
+  """Updates the note’s content. Returns the updated note."""
+  content(
+    """The new content of the note."""
+    content: JSON
+  ): Note!
+
+  """Updates the note's date. Returns the updated note."""
+  date(
+    """The new date of the note."""
+    date: NaiveDate
+  ): Note!
+
+  """Delete the note. Returns the deleted note."""
+  delete: Note!
+
+  """Updates the note's subject. Returns the updated note."""
+  subject(
+    """The new subject of the note."""
+    subject: Int
+  ): Note!
+
+  """Updates the note's title. Returns the updated note."""
+  title(
+    """The new title of the note."""
+    title: String!
+  ): Note!
+}
+
 type QueryRoot {
   """Get authenticated user data or null if not authenticated."""
   currentUser: User
 
   """
-  Get a single document by ID.
+  Get a single note by ID.
   Requires authentication.
   """
-  document(
-    """The ID of the document to get."""
+  note(
+    """The ID of the note to get."""
     id: Int!
-  ): Document!
+  ): Note!
 
   """
-  Get list of all documents owned by the authenticated user.
+  Get list of all notes owned by the authenticated user.
   Requires authentication.
   """
-  documents: [Document!]!
+  notes: [Note!]!
 
   """
   Get a single subject by ID.
