@@ -3,10 +3,12 @@ pub(super) mod session;
 pub(super) mod subject;
 pub(super) mod todo;
 pub(super) mod note;
+mod assessment;
 
 use async_graphql::{Context, Result, Object};
 use rocket::http::Status;
 use sqlx::{PgPool, query_as};
+use crate::api::graphql::query::assessment::Assessment;
 use crate::api::graphql::query::note::Note;
 use crate::api::graphql::query::subject::Subject;
 use crate::api::graphql::query::todo::Todo;
@@ -85,6 +87,24 @@ impl QueryRoot {
         };
         let pool = ctx.data::<PgPool>()?;
         query_as!(Todo, /* language=postgresql */ "SELECT * FROM todos WHERE owner = $1 AND id = $2 LIMIT 1;", user.id, id)
+            .fetch_optional(pool).await?.ok_or(Status::NotFound.into())
+    }
+
+    async fn assessments(&self, ctx: &Context<'_>) -> Result<Vec<Assessment>> {
+        let Some(user) = ctx.data::<Option<User>>()? else {
+            return Err(Status::Unauthorized.into());
+        };
+        let pool = ctx.data::<PgPool>()?;
+        Ok(query_as!(Assessment, /* language=postgresql */ "SELECT * FROM assessments WHERE owner = $1;", user.id)
+            .fetch_all(pool).await?)
+    }
+
+    async fn assessment(&self, ctx: &Context<'_>, id: i32) -> Result<Assessment> {
+        let Some(user) = ctx.data::<Option<User>>()? else {
+            return Err(Status::Unauthorized.into());
+        };
+        let pool = ctx.data::<PgPool>()?;
+        query_as!(Assessment, /* language=postgresql */ "SELECT * FROM assessments WHERE owner = $1 AND id = $2 LIMIT 1;", user.id, id)
             .fetch_optional(pool).await?.ok_or(Status::NotFound.into())
     }
 }

@@ -3,6 +3,42 @@ schema {
   mutation: MutationRoot
 }
 
+type Assessment {
+  due: NaiveDate!
+  duePeriod: DuePeriod!
+  exam: Boolean!
+  id: Int!
+  issued: NaiveDate
+  mark: Int
+  markOutOf: Int
+  notification: String
+  reference: String
+  status: AssessmentStatus!
+  subject: Subject
+  submission: String
+  title: String!
+  weight: Int!
+}
+
+enum AssessmentStatus {
+  FINISHED
+  IN_PROGRESS
+  NOT_ISSUED
+  NOT_STARTED
+  RESULTS_RECEIVED
+}
+
+enum DuePeriod {
+  AS
+  BS
+  FOUR
+  MIDNIGHT
+  ONE
+  RC
+  THREE
+  TWO
+}
+
 """A scalar that can represent any JSON value."""
 scalar JSON
 
@@ -164,6 +200,9 @@ type NoteMutation {
 }
 
 type QueryRoot {
+  assessment(id: Int!): Assessment!
+  assessments: [Assessment!]!
+
   """Get authenticated user data or null if not authenticated."""
   currentUser: User
 

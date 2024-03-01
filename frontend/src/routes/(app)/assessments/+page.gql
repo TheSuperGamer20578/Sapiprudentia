@@ -1,0 +1,20 @@
+query Assessments {
+    assessments {
+        id,
+        subject {
+            name,
+        },
+        title,
+        exam,
+        status,
+        weight,
+        due,
+        duePeriod,
+        issued,
+        markOutOf,
+        mark,
+        notification,
+        submission,
+        reference,
+    }
+}

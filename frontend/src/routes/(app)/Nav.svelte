@@ -6,6 +6,7 @@
     <ul>
         <li><a href="/todo">Todo</a></li>
         <li><a href="/notes">Notes</a></li>
+        <li><a href="/assessments">Assessments</a></li>
     </ul>
     <hr />
     <ul>
