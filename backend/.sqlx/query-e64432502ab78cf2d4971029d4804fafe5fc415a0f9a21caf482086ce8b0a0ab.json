@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "UPDATE documents SET content = $2 WHERE id = $1 RETURNING *;",
+  "query": "UPDATE notes SET date = $2 WHERE id = $1 RETURNING *;",
   "describe": {
     "columns": [
       {
@@ -10,44 +10,44 @@
       },
       {
         "ordinal": 1,
-        "name": "created_at",
-        "type_info": "Timestamp"
+        "name": "owner",
+        "type_info": "Int4"
       },
       {
         "ordinal": 2,
+        "name": "date",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 3,
         "name": "title",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 3,
-        "name": "content",
-        "type_info": "Jsonb"
-      },
-      {
         "ordinal": 4,
-        "name": "last_modified",
-        "type_info": "Timestamp"
+        "name": "subject",
+        "type_info": "Int4"
       },
       {
         "ordinal": 5,
-        "name": "owner",
-        "type_info": "Int4"
+        "name": "content",
+        "type_info": "Jsonb"
       }
     ],
     "parameters": {
       "Left": [
         "Int4",
-        "Jsonb"
+        "Date"
       ]
     },
     "nullable": [
       false,
       false,
       false,
-      true,
       false,
+      true,
       false
     ]
   },
-  "hash": "ee871a41d6d5240e49971a56cfbce0d850cbb27a6882f19651a538abbda14e79"
+  "hash": "e64432502ab78cf2d4971029d4804fafe5fc415a0f9a21caf482086ce8b0a0ab"
 }

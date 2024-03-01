@@ -1,0 +1,106 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT * FROM assessments WHERE owner = $1;",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "owner",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "subject",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "exam",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "status",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 6,
+        "name": "weight",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 7,
+        "name": "due",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 8,
+        "name": "due_period",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 9,
+        "name": "issued",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 10,
+        "name": "mark_out_of",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 11,
+        "name": "mark",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 12,
+        "name": "notification",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 13,
+        "name": "submission",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 14,
+        "name": "reference",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "67a485fa00ef05ebd5448e079f804971f5a7ce21725b9d750ca6c10cef073919"
+}

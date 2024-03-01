@@ -91,12 +91,8 @@ pub struct Assessment {
 
 #[ComplexObject]
 impl Assessment {
-    async fn subject(&self, ctx: &Context<'_>) -> Result<Option<Subject>> {
-        Ok(if let Some(subject) = self.subject {
-            Some(query_as!(Subject, /* language=postgresql */ "SELECT * FROM subjects WHERE id = $1 LIMIT 1;", subject)
-                .fetch_one(ctx.data::<PgPool>()?).await.or(Err(Status::InternalServerError))?)
-        } else {
-            None
-        })
+    async fn subject(&self, ctx: &Context<'_>) -> Result<Subject> {
+        query_as!(Subject, /* language=postgresql */ "SELECT * FROM subjects WHERE id = $1 LIMIT 1;", self.subject)
+            .fetch_one(ctx.data::<PgPool>()?).await.or(Err(Status::InternalServerError)).map_err(Into::into)
     }
 }
