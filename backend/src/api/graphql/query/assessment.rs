@@ -78,7 +78,7 @@ pub struct Assessment {
     pub exam: bool,
     pub status: AssessmentStatus,
     pub weight: i16,
-    pub due: NaiveDate,
+    pub due: Option<NaiveDate>,
     pub due_period: DuePeriod,
     pub issued: Option<NaiveDate>,
     pub mark_out_of: Option<i16>,

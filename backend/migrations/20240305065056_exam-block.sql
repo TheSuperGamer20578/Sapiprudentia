@@ -1,0 +1,2 @@
+ALTER TABLE assessments
+    ALTER COLUMN due DROP NOT NULL;

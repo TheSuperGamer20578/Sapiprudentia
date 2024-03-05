@@ -4,7 +4,7 @@ schema {
 }
 
 type Assessment {
-  due: NaiveDate!
+  due: NaiveDate
   duePeriod: DuePeriod!
   exam: Boolean!
   id: Int!

@@ -8,8 +8,8 @@
         exam: boolean;
         status: "NOT_ISSUED" | "NOT_STARTED" | "IN_PROGRESS" | "FINISHED" | "RESULTS_RECEIVED";
         weight: number;
-        due: DateTime;
-        duePeriod: "BS" | "RC" | "ONE" | "TWO" | "THREE" | "FOUR" | "AS" | "MIDNIGHT";
+        due: DateTime | null;
+        duePeriod: "BS" | "RC" | "ONE" | "TWO" | "THREE" | "FOUR" | "AS" | "MIDNIGHT" | null;
         issued: DateTime | null;
         markOutOf: number | null;
         mark: number | null;
@@ -38,8 +38,10 @@
 </script>
 
 <ul>
-    {#each assessments.sort((a, b) => a.due.toUnixInteger() - b.due.toUnixInteger()) as assessment (assessment.id)}
-        {@const days = Math.round(assessment.due.diff(DateTime.now().startOf("day")).as("days"))}
+    {#each assessments.sort((a, b) => (a.due?.toUnixInteger() ?? Infinity) - (b.due?.toUnixInteger() ?? Infinity)) as assessment (assessment.id)}
+        {@const days = Math.round(
+            assessment.due?.diff(DateTime.now().startOf("day")).as("days") ?? Infinity,
+        )}
         <li
             class:exam={assessment.exam}
             class:fortnight={days <= 14}
@@ -66,7 +68,7 @@
                     {assessment.issued.weekdayLong}
                     {assessment.issued.toLocaleString()}
                 </div>
-            {:else}
+            {:else if assessment.due}
                 {@const issue_by = assessment.due.minus({weeks: 2})}
                 <div class="issue-by">
                     Must be issued by:
@@ -75,10 +77,16 @@
                 </div>
             {/if}
             <div class="due">
-                Due:
-                {assessment.due.weekdayLong}
-                {assessment.due.toLocaleString()}
-                {duePeriodTranslation[assessment.duePeriod]}
+                {#if assessment.due}
+                    Due:
+                    {assessment.due.weekdayLong}
+                    {assessment.due.toLocaleString()}
+                    {#if assessment.duePeriod}
+                        {duePeriodTranslation[assessment.duePeriod]}
+                    {/if}
+                {:else}
+                    Examination Block
+                {/if}
             </div>
             <span class="status" data-status={assessment.status}>
                 {#if assessment.exam && assessment.status === "NOT_STARTED"}
