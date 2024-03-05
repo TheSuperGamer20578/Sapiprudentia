@@ -14,6 +14,7 @@
             subject: (todo.subject && {...todo.subject}) ?? undefined,
             parent: todo.parent?.id,
             archived: todo.archived,
+            standing: todo.standing,
         })) ?? [];
     $: subjects = $Todo.data?.subjects ?? [];
 </script>

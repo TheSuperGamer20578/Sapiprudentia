@@ -53,6 +53,11 @@ impl TodoMutation {
         query_as!(Todo, /* language=postgresql */ "UPDATE todos SET archived = $2 WHERE id = $1 RETURNING *;", self.0, archived)
             .fetch_one(ctx.data::<sqlx::PgPool>()?).await.map_err(Into::into)
     }
+    
+    async fn standing(&self, ctx: &Context<'_>, standing: bool) -> Result<Todo> {
+        query_as!(Todo, /* language=postgresql */ "UPDATE todos SET standing = $2 WHERE id = $1 RETURNING *;", self.0, standing)
+            .fetch_one(ctx.data::<sqlx::PgPool>()?).await.map_err(Into::into)
+    }
 
     /// Creates a child to-do. Returns the newly created to-do.
     /// Requires authentication.

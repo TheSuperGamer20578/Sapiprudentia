@@ -20,6 +20,7 @@
         subject?: {id: number; name: string};
         parent?: number;
         archived: boolean;
+        standing: boolean;
     }
 
     export let todos: Todo[];
@@ -33,6 +34,7 @@
         subject: number | null;
         due: DateTime | null;
         parent: any | null;
+        standing: boolean;
     }) => void;
 
     const archive = graphql(`
@@ -110,6 +112,7 @@
                                     subject: todo.subject?.id ?? null,
                                     due: todo.due ?? null,
                                     parent: todo.parent,
+                                    standing: todo.standing,
                                 });
                             }}
                         >

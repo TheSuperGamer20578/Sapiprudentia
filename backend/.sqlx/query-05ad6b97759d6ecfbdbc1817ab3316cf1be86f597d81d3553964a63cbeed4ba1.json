@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "UPDATE todos SET completed = $2 WHERE id = $1 RETURNING *;",
+  "query": "UPDATE todos SET standing = $2 WHERE id = $1 RETURNING *;",
   "describe": {
     "columns": [
       {
@@ -67,5 +67,5 @@
       false
     ]
   },
-  "hash": "b2335f186a444b569088d1974e5503326f4ffe393ca269dd9a96fdc3c5f0a3d8"
+  "hash": "05ad6b97759d6ecfbdbc1817ab3316cf1be86f597d81d3553964a63cbeed4ba1"
 }

@@ -91,6 +91,7 @@ type MutationRoot {
 
     """The due date of the to-do. Default: null"""
     due: NaiveDate = null
+    standing: Boolean! = false
 
     """The to-do's subject's ID. Default: null"""
     subject: Int = null
@@ -346,6 +347,7 @@ type Todo {
 
   """The parent of the to-do."""
   parent: Todo
+  standing: Boolean!
 
   """The subject of the to-do."""
   subject: Subject
@@ -403,6 +405,7 @@ type TodoMutation {
     """The new parent's ID."""
     id: Int
   ): Todo!
+  standing(standing: Boolean!): Todo!
 
   """Updates the to-do's subject. Returns the updated to-do."""
   subject(

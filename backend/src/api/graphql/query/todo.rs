@@ -31,6 +31,7 @@ pub struct Todo {
     /// Whether the to-do is archived.
     /// Archived todos are hidden from the default view.
     pub archived: bool,
+    pub standing: bool,
 }
 
 #[ComplexObject]

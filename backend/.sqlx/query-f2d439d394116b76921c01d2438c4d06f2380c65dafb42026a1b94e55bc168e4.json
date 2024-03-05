@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO todos (owner, title, completed, due, archived, subject) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;",
+  "query": "INSERT INTO todos (owner, title, completed, due, archived, subject, standing) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;",
   "describe": {
     "columns": [
       {
@@ -42,6 +42,11 @@
         "ordinal": 7,
         "name": "archived",
         "type_info": "Bool"
+      },
+      {
+        "ordinal": 8,
+        "name": "standing",
+        "type_info": "Bool"
       }
     ],
     "parameters": {
@@ -51,7 +56,8 @@
         "Bool",
         "Date",
         "Bool",
-        "Int4"
+        "Int4",
+        "Bool"
       ]
     },
     "nullable": [
@@ -62,8 +68,9 @@
       true,
       true,
       true,
+      false,
       false
     ]
   },
-  "hash": "3411aedefb9b399f310772dcbb7677f0d75fa5bdc80fb4b55238fcdd4522f0cb"
+  "hash": "f2d439d394116b76921c01d2438c4d06f2380c65dafb42026a1b94e55bc168e4"
 }

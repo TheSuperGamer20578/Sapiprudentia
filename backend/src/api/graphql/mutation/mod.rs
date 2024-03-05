@@ -106,11 +106,12 @@ impl MutationRoot {
         #[graphql(desc = "The due date of the to-do. Default: null", default)] due: Option<NaiveDate>,
         #[graphql(desc = "The archived status of the to-do. Default: false", default = false)] archived: bool,
         #[graphql(desc = "The to-do's subject's ID. Default: null", default)] subject: Option<i32>,
+        #[graphql(default = false)] standing: bool,
     ) -> Result<Todo> {
         let Some(user) = ctx.data::<Option<User>>()? else {
             return Err(Status::Unauthorized.into());
         };
-        query_as!(Todo, /* language=postgresql */ "INSERT INTO todos (owner, title, completed, due, archived, subject) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;", user.id, title, completed, due, archived, subject)
+        query_as!(Todo, /* language=postgresql */ "INSERT INTO todos (owner, title, completed, due, archived, subject, standing) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;", user.id, title, completed, due, archived, subject, standing)
             .fetch_one(ctx.data::<PgPool>()?).await.map_err(Into::into)
     }
 

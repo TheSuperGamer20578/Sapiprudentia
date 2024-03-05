@@ -12,6 +12,7 @@ query Todo {
         parent {
             id
         }
+        standing
     }
     subjects {
         id

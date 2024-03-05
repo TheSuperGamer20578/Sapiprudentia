@@ -9,9 +9,11 @@
     let title = "";
     let subject = "null";
     let due: string | null = null;
+    let standing: boolean = false;
     let showSubject = true;
     let parent: number | null = null;
     let editing: number | null = null;
+    let isRoot: boolean = false;
 
     export let subjects: {id: number; name: string}[];
 
@@ -19,9 +21,11 @@
         title = "";
         subject = JSON.stringify(withSubject);
         due = null;
+        standing = false;
         showSubject = withSubject === null;
         parent = null;
         editing = null;
+        isRoot = true;
         modal.open();
     }
 
@@ -29,9 +33,11 @@
         title = "";
         subject = "null";
         due = null;
+        standing = false;
         showSubject = false;
         parent = withParent;
         editing = null;
+        isRoot = false;
         modal.open();
     }
 
@@ -40,20 +46,23 @@
         title: string;
         subject: number | null;
         due: DateTime | null;
+        standing: boolean;
         parent: any | null;
         showSubject: boolean;
     }) {
         title = todo.title;
         subject = JSON.stringify(todo.subject);
         due = todo.due?.toISODate() ?? null;
+        standing = todo.standing;
         showSubject = todo.showSubject && todo.parent === null;
         editing = todo.id;
+        isRoot = !todo.parent;
         modal.open();
     }
 
     const createTodo = graphql(`
-        mutation CreateTodo($title: String!, $subject: Int, $due: NaiveDate) {
-            createTodo(title: $title, subject: $subject, due: $due) {
+        mutation CreateTodo($title: String!, $subject: Int, $due: NaiveDate, $standing: Boolean!) {
+            createTodo(title: $title, subject: $subject, due: $due, standing: $standing) {
                 ...todos_insert
             }
         }
@@ -70,7 +79,13 @@
     `);
 
     const editTodo = graphql(`
-        mutation EditTodo($id: Int!, $title: String!, $subject: Int, $due: NaiveDate) {
+        mutation EditTodo(
+            $id: Int!
+            $title: String!
+            $subject: Int
+            $due: NaiveDate
+            $standing: Boolean!
+        ) {
             todo(id: $id) {
                 title(title: $title) {
                     id
@@ -87,6 +102,10 @@
                     id
                     due
                 }
+                standing(standing: $standing) {
+                    id
+                    standing
+                }
             }
         }
     `);
@@ -102,12 +121,14 @@
                     title,
                     subject: JSON.parse(subject),
                     due: due ? DateTime.fromISO(due) : null,
+                    standing,
                 });
             } else if (parent === null) {
                 createTodo.mutate({
                     title,
                     subject: JSON.parse(subject),
                     due: due ? DateTime.fromISO(due) : null,
+                    standing,
                 });
             } else {
                 createChild.mutate({
@@ -131,6 +152,12 @@
         <label>
             Due: <input bind:value={due} type="date" />
         </label>
+        {#if isRoot}
+            <label>
+                <input bind:checked={standing} type="checkbox" />
+                Standing
+            </label>
+        {/if}
         <input type="submit" value={editing === null ? "Create" : "Save"} />
     </Form>
 </Modal>
