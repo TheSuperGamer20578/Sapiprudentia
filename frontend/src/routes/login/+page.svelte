@@ -9,11 +9,13 @@
             <label>
                 Username: <input autofocus name="login" type="text" />
             </label>
-            <br />
             <label>
                 Password: <input name="password" type="password" />
             </label>
-            <br />
+            <label>
+                <input name="remember" type="checkbox" />
+                Remember me
+            </label>
             <input type="submit" />
         </Form>
     </div>

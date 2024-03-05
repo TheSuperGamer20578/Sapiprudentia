@@ -20,7 +20,7 @@
             display: block
             margin-bottom: 1em
 
-        :global(input)
+        :global(input:not([type="checkbox"]))
             border: none
             outline: none
             border-bottom: $fg 1px solid

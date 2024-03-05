@@ -1,5 +1,6 @@
 import {type Actions, fail, redirect} from "@sveltejs/kit";
 import {login} from "$lib/auth";
+import {DateTime} from "luxon";
 
 export const actions = {
     default: async ({request, cookies, url}) => {
@@ -19,7 +20,10 @@ export const actions = {
             }
             throw e;
         }
-        cookies.set("session", resp.token, {path: "/"});
+        cookies.set("session", resp.token, {
+            path: "/",
+            expires: data.get("remember") ? DateTime.now().plus({days: 365}).toJSDate() : undefined,
+        });
         throw redirect(303, url.searchParams.get("next") ?? "/");
     },
 } satisfies Actions;
