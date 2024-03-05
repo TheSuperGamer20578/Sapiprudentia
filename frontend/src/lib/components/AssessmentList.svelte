@@ -61,11 +61,17 @@
                 </span>
             {/if}
             {#if assessment.issued}
-                <div class="issued">Issued: {assessment.issued.toLocaleString()}</div>
+                <div class="issued">
+                    Issued:
+                    {assessment.issued.weekdayLong}
+                    {assessment.issued.toLocaleString()}
+                </div>
             {:else}
+                {@const issue_by = assessment.due.minus({weeks: 2})}
                 <div class="issue-by">
                     Must be issued by:
-                    {assessment.due.minus({weeks: 2}).toLocaleString()}
+                    {issue_by.weekdayLong}
+                    {issue_by.toLocaleString()}
                 </div>
             {/if}
             <div class="due">
