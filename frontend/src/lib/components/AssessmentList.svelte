@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {type DateTime, Duration} from "luxon";
+    import {DateTime} from "luxon";
 
     export let assessments: {
         id: number;
@@ -39,7 +39,14 @@
 
 <ul>
     {#each assessments.sort((a, b) => a.due.toUnixInteger() - b.due.toUnixInteger()) as assessment (assessment.id)}
-        <li class:exam={assessment.exam}>
+        {@const days = Math.round(assessment.due.diff(DateTime.now().startOf("day")).as("days"))}
+        <li
+            class:exam={assessment.exam}
+            class:fortnight={days <= 14}
+            class:week={days <= 7}
+            class:soon={days <= 2}
+            class:late={days <= 0}
+        >
             <span class="subject">{assessment.subject.name}</span>
             <span class="title">{assessment.title}</span>
             <span class="weight">{assessment.weight}%</span>
@@ -63,31 +70,81 @@
             {/if}
             <div class="due">
                 Due:
+                {assessment.due.weekdayLong}
                 {assessment.due.toLocaleString()}
                 {duePeriodTranslation[assessment.duePeriod]}
             </div>
             <span class="status" data-status={assessment.status}>
-                {statusTranslation[assessment.status]}
+                {#if assessment.exam && assessment.status === "NOT_STARTED"}
+                    Exam
+                {:else}
+                    {statusTranslation[assessment.status]}
+                {/if}
             </span>
         </li>
     {/each}
 </ul>
 
 <style lang="sass">
+    @import "$lib/vars"
+
     ul
         list-style-type: none
 
     li
         margin-top: 1em
+        border-left: 3px solid $fg-accent
+        padding: 0.5em 1em
+        &.exam
+            border-color: $warning
+        &:has(.status[data-status="NOT_ISSUED"])
+            color: $fg-placeholder
+        &.fortnight .issue-by
+            color: $danger
+            font-weight: bolder
+        &:not(:has(.status[data-status="FINISHED"], .status[data-status="RESULTS_RECIEVED"]))
+            &.fortnight:not(.exam) .due
+                font-weight: bold
+            &.week:not(.exam) .due
+                font-weight: bolder
+                color: $fg-accent
+            &.soon:not(.exam) .due
+                color: $warning
+            &.soon.exam .due
+                color: $fg-accent
+            &.late .due
+                color: $danger
 
     .subject
         padding-right: 0.5em
         margin-right: 0.5em
-        border-right: 1px solid black
+        border-right: 1px solid
 
     .issued, .issue-by
         margin-top: 0.25em
 
+    .issued
+        color: $fg-placeholder
+
     .weight
         margin-inline: 0.5em 1em
+
+    .status
+        display: inline-block
+        padding: 0.25em 0.5em
+        border-radius: 1em
+        margin-top: 0.25em
+        &[data-status="NOT_ISSUED"]
+            color: $fg-placeholder
+            background: $bg-placeholder
+        &[data-status="NOT_STARTED"]
+            color: $fg
+            background: $bg-placeholder
+        &[data-status="IN_PROGRESS"]
+            color: $fg
+            background: $bg-accent
+        &[data-status="FINISHED"],
+        &[data-status="RESULTS_RECEIVED"]
+            color: $fg
+            background: $success
 </style>

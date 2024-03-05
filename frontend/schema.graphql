@@ -14,7 +14,7 @@ type Assessment {
   notification: String
   reference: String
   status: AssessmentStatus!
-  subject: Subject
+  subject: Subject!
   submission: String
   title: String!
   weight: Int!
