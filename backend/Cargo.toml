@@ -18,11 +18,7 @@ rocket_cors = "0.6.0"
 serde = "1.0.196"
 serde_json = "1.0.113"
 serde_with = "3.5.1"
-shuttle-rocket = "0.37.0"
-shuttle-runtime = "0.37.0"
-shuttle-secrets = "0.37.0"
-shuttle-shared-db = { version = "0.37.0", features = ["postgres", "sqlx"] }
-sqlx = { version = "0.7.3", features = ["postgres", "macros", "chrono"] }
+sqlx = { version = "0.7.3", features = ["postgres", "macros", "chrono", "runtime-tokio"] }
 tokio = "1.35.1"
 
 [features]

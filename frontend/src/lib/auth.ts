@@ -1,4 +1,4 @@
-import {PUBLIC_API_URL} from "$env/static/public";
+import {env} from "$env/dynamic/public";
 
 export interface User {
     id: number;
@@ -11,7 +11,7 @@ export interface User {
 }
 
 export async function login(login: string, password: string): Promise<{token: string; user: User}> {
-    const resp = await fetch(`${PUBLIC_API_URL}/auth/login`, {
+    const resp = await fetch(`${env.PUBLIC_API_URL}/auth/login`, {
         credentials: "include",
         method: "POST",
         body: JSON.stringify({login, password}),
@@ -25,7 +25,7 @@ export async function login(login: string, password: string): Promise<{token: st
 }
 
 export async function currentUser(token: string): Promise<User | null> {
-    const resp = await fetch(`${PUBLIC_API_URL}/auth/login`, {
+    const resp = await fetch(`${env.PUBLIC_API_URL}/auth/login`, {
         credentials: "include",
         method: "GET",
         headers: {
@@ -39,7 +39,7 @@ export async function currentUser(token: string): Promise<User | null> {
 }
 
 export async function logout(token: string): Promise<void> {
-    const resp = await fetch(`${PUBLIC_API_URL}/auth/login`, {
+    const resp = await fetch(`${env.PUBLIC_API_URL}/auth/login`, {
         credentials: "include",
         method: "DELETE",
         headers: {

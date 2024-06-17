@@ -1,8 +1,8 @@
 import {HoudiniClient} from "$houdini";
-import {PUBLIC_API_URL} from "$env/static/public";
+import {env} from "$env/dynamic/public";
 
 export default new HoudiniClient({
-    url: `${PUBLIC_API_URL}/graphql`,
+    url: `${env.PUBLIC_API_URL}/graphql`,
     fetchParams: ({session}) => {
         if (session) {
             return {
