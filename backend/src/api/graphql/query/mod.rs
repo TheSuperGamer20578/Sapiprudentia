@@ -75,7 +75,7 @@ impl QueryRoot {
             return Err(Status::Unauthorized.into());
         };
         let pool = ctx.data::<PgPool>()?;
-        Ok(query_as!(Todo, /* language=postgresql */ "SELECT * FROM todos WHERE owner = $1;", user.id)
+        Ok(query_as!(Todo, /* language=postgresql */ "SELECT * FROM todos WHERE owner = $1 ORDER BY title;", user.id)
             .fetch_all(pool).await?)
     }
 
